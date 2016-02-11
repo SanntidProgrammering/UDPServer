@@ -211,6 +211,7 @@ public class Logic {
      * sets the correct motorspeeds from state (manual mode)
      */
     protected void switchCaseMotorSpeeds() {
+        
         switch (this.getState()) {
             case STOP:
                 dh.setLeftMotorSpeed(minSpeed);
@@ -233,12 +234,13 @@ public class Logic {
                 dh.setRightMotorSpeed(maxSpeed);
                 break;
             case GOFWDANDLEFT:
-                dh.setLeftMotorSpeed(maxSpeed / 4);
-                dh.setRightMotorSpeed(maxSpeed);
+                System.out.println("fwd and left");
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed/4);
                 break;
             case GOFWDANDRIGHT:
-                dh.setLeftMotorSpeed(maxSpeed);
-                dh.setRightMotorSpeed(maxSpeed / 4);
+                dh.setLeftMotorSpeed(maxSpeed/4);
+                dh.setRightMotorSpeed(maxSpeed);
                 break;
             case GOREVANDRIGHT:
                 dh.setLeftMotorSpeed(maxSpeed);
