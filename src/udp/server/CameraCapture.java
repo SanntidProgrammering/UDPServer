@@ -60,9 +60,9 @@ public class CameraCapture extends Thread {
             if(buff != null)
             {
                 try {
-                    buff = this.scale(buff, buff.getType(), buff.getWidth(), buff.getHeight(), 0.25, 0.25);
+                    //buff = this.scale(buff, buff.getType(), buff.getWidth(), buff.getHeight(), 0.25, 0.25);
             
-                    ImageIO.write(buff, "bmp", baos);
+                    ImageIO.write(buff, "jpg", baos);
                     baos.flush();
                     byte[] imageInByte = baos.toByteArray();
                     baos.close();
@@ -89,7 +89,7 @@ public class CameraCapture extends Thread {
             try {
                 capture.retrieve(frame);
                 this.setFrame(frame);
-               	Highgui.imencode(".bmp", frame, mob);
+               	Highgui.imencode(".jpg", frame, mob);
 		Image im;
                 im = ImageIO.read(new ByteArrayInputStream(mob.toArray()));
 	       	BufferedImage buff = (BufferedImage) im;

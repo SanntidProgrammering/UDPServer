@@ -24,7 +24,7 @@ public class Controller implements Runnable {
     private byte lastAUVstate;
     private boolean autoRunning;
 
-    private final long PIDperiodeTime = 100;
+    private final long PIDperiodeTime = 50;
 
     private Thread t;
 

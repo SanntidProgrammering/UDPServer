@@ -457,6 +457,7 @@ public class DataHandler {
         if (speed > 255.0f) {
             speed = 255.0f;
         }
+        System.out.println("left speed " + speed);
         dataToArduino[Protocol.LEFT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
 
@@ -479,6 +480,7 @@ public class DataHandler {
         if (speed > 255.0f) {
             speed = 255.0f;
         }
+        System.out.println("right speed " + speed);
         dataToArduino[Protocol.RIGHT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
     }
