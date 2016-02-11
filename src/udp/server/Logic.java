@@ -44,7 +44,7 @@ public class Logic {
     private final DataHandler dh;
     private final int maxSpeed = 255;
     private final int minSpeed = 0;
-    private final int distanceToHitBall = 17;
+    private final int distanceToHitBall = 22;
     
     private boolean isServoOut = false;
     

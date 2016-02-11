@@ -54,13 +54,18 @@ public class ObjectTracker implements Runnable {
     private List<Mat> lhsv;
     private Mat array255;
     private Mat distance;
+                               //Blåball //Flaske
+    private int hueMin = 29;//104; //40;//35; 
+    private int hueMax = 38;//115; //68;//74;
+    private int satMin = 66;//185;//51;//93;
+    private int satMax = 195;//255;//255;//223;
+    private int valMin = 71;//36;//38;//74;
+    private int valMax = 255;//100;//167;//14335;
     
-    private int hueMin = 40;//35;
-    private int hueMax = 68;//74;
-    private int satMin = 51;//93;
-    private int satMax = 255;//223;
-    private int valMin = 38;//74;
-    private int valMax = 167;//14335;
+    // Flaske Hue[40 68] Sat[51 255] Val[38 167]
+    // Blåball Hue[104 115] Sat[185 255] Val[36 100] Fungerer ikke
+    // Tennisball Hue[29 38] Sat[66 195] Val[71 255]
+    
     
     private double brightness;
     private double contrast;
