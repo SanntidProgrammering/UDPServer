@@ -26,6 +26,8 @@ public class DataHandler {
         right = false;
         left = false;
         attack = false;
+        System.out.println("Jeg forstår ikke hva du har gjort her!");
+        
         
         for(int i = 0; i <= 4; i++)
         {
