@@ -9,11 +9,6 @@ package udp.server;
  *
  * @author Eivind
  */
-public class DataHandler {
-    
-    public DataHandler()
-    {
-        
-    }
+public class ArduinoData {
     
 }

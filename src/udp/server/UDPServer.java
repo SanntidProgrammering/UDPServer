@@ -5,9 +5,7 @@
  */
 package udp.server;
 
-import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
 
 /**
  *
@@ -15,25 +13,14 @@ import java.util.ArrayList;
  */
 public class UDPServer {
     
-    /*
-    fwd = 0
-    left = 1
-    rev = 2
-    right = 3
-    attack = 4
-    */
-    
     private DatagramSocket serverSocket;
     private final int serverPort = 9876;
-    private ByteArrayInputStream baos;
-    private ObjectInputStream ois;
     
-    private ArrayList<Boolean> list;
-    private DataHandler data;
+    private final GUIData data;
     
     public UDPServer () throws Exception
     {
-        data = new DataHandler();
+        data = new GUIData();
         this.run();
     }
     
@@ -53,12 +40,7 @@ public class UDPServer {
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             serverSocket.receive(receivePacket);
             
-            baos = new ByteArrayInputStream(receiveData);
-            ois = new ObjectInputStream(baos);
-            
-            list = (ArrayList<Boolean>) ois.readObject(); 
-            
-            data.checkData(list);
+            data.processData(receiveData);
         }
     }
 }
