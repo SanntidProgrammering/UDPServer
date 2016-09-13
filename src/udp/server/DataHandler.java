@@ -5,109 +5,97 @@
  */
 package udp.server;
 
-import java.util.ArrayList;
-
 /**
- *
- * @author Eivind
+ * Overview protocols:
+ * To Arduino:
+ * Byte 0: bit 0 - stopp
+ *         bit 1 - fwd
+ *         bit 2 - rev
+ *         bit 3 - left
+ *         bit 4 - right
+ * Byte 1: Left motor speed
+ * Byte 2: Right motor speed
+ * Byte 3: bit 0 - left servo
+ *         bit 1 - right servo
+ *         bit 2 - auto/manual
+ *         bit 3 - start
+ *         bit 7 - request feedback
+ * Byte 4: Sensitivity
+ * Byte 5: Reserved
+ * 
+ * From Arduino:
+ * Byte 0: Pixy x value low byte
+ * Byte 1: Pixy x value high byte
+ * Byte 2: Pixy y value low byte
+ * Byte 3: Pixy y value high byte
+ * Byte 4: Distance sensor 4-30 cm
+ * Byte 5: Reserved
+ * 
+ * @author Eivind Fugledal
  */
 public class DataHandler {
     
-    private ArrayList<Boolean> dataList;
+    private final GUIData gui;
+    private final ArduinoData arduino;
     
-    private boolean fwd, rev, right, left, attack;
+    private byte[] toArduino;
+    private byte[] fromArduino;
     
+    /**
+     * 
+     */
     public DataHandler()
     {
-        dataList = new ArrayList<>();
+        gui = new GUIData(this);
+        arduino = new ArduinoData();
         
-        fwd = false;
-        rev = false;
-        right = false;
-        left = false;
-        attack = false;
+        toArduino = new byte[6];
+        fromArduino = new byte[6];
         
-        for(int i = 0; i <= 4; i++)
-        {
-            dataList.add(false);
-        }
+        // Must be the last call in the constructor
+        this.startThreads();
     }
     
     /**
-     * Checks for changes in controls
-     * @param list Arraylist containing the controls
+     * Updates byte arrays when receiving from either GUI or Arduino
+     * @param data New data set from GUI/Arduino
+     * @param id An identifier used to set correct byte array
      */
-    public void checkData(ArrayList<Boolean> list)
+    public synchronized void setData(byte[] data, String id)
     {
-        if(list != dataList)
-        {
-            if(list.get(0) != fwd)
-            {
-                fwd = list.get(0);
-                runFWD(list.get(0));
-            }
-            if(list.get(1) != left)
-            {
-                left = list.get(1);
-                runLEFT(list.get(1));
-            }
-            if(list.get(2) != rev)
-            {
-                rev = list.get(2);
-                runREV(list.get(2));
-            }
-            if(list.get(3) != right)
-            {
-                right = list.get(3);
-                runRIGHT(list.get(3));
-            }
-            if(list.get(4) != attack)
-            {
-                attack = list.get(4);
-                attack(list.get(4));
-            }
-            
-            dataList = list;
-        }
+        if(id.toLowerCase().equals("gui"))
+            this.toArduino = data;
+        if(id.toLowerCase().equals("arduino"))
+            this.fromArduino = data;
+        
+        notifyAll();
     }
     
-    private void runFWD(boolean fwd)
+    /**
+     * Returns a byte array with requested data
+     * @param id An identifier used to return correct byte array
+     * @return The requested byte array
+     */
+    public synchronized byte[] getData(String id)
     {
-        if(fwd)
-            System.out.println("Running forward");
-        else
-            System.out.println("Not forward");
+        byte[] temp = new byte[6];
+        
+        if(id.toLowerCase().equals("gui"))
+            temp = toArduino;
+        if(id.toLowerCase().equals("arduino"))
+            temp = fromArduino;
+        
+        notifyAll();
+        
+        return temp;
     }
     
-    private void runREV(boolean rev)
+    /**
+     * Starts thred for GUI receiving/sending and Arduino receiving/sending
+     */
+    private void startThreads()
     {
-        if(rev)
-            System.out.println("Running reverse");
-        else
-            System.out.println("Not reverse");
-    }
-    
-    private void runRIGHT(boolean right)
-    {
-        if(right)
-            System.out.println("Running right");
-        else
-            System.out.println("Not right");
-    }
-    
-    private void runLEFT(boolean left)
-    {
-        if(left)
-            System.out.println("Running left");
-        else
-            System.out.println("Not left");
-    }
-    
-    private void attack(boolean attack)
-    {
-        if(attack)
-            System.out.println("Attacking!!!");
-        else
-            System.out.println("Not attacking");
+        gui.start();
+        arduino.start();
     }
 }
