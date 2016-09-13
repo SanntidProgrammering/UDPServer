@@ -9,18 +9,18 @@ import java.net.*;
 
 /**
  *
- * @author Eivind
+ * @author Eivind Fugledal
  */
 public class UDPServer {
     
     private DatagramSocket serverSocket;
     private final int serverPort = 9876;
     
-    private final GUIData data;
+    private final GUIData guiData;
     
-    public UDPServer () throws Exception
+    public UDPServer (GUIData data) throws Exception
     {
-        data = new GUIData();
+        guiData = data;
         this.run();
     }
     
@@ -32,15 +32,15 @@ public class UDPServer {
     {
         serverSocket = new DatagramSocket(serverPort);
         
-        byte[] receiveData = new byte[1024];
-        byte[] sendData = new byte[1024];
+        byte[] receiveData = new byte[6];
+        byte[] sendData = new byte[6];
         
         while(true)
         {
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             serverSocket.receive(receivePacket);
             
-            data.processData(receiveData);
+            guiData.receiveFromUDP(receiveData);
         }
     }
 }

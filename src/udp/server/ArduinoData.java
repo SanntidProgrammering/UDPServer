@@ -7,8 +7,8 @@ package udp.server;
 
 /**
  *
- * @author Eivind
+ * @author Eivind Fugledal
  */
-public class ArduinoData {
+public class ArduinoData extends Thread {
     
 }

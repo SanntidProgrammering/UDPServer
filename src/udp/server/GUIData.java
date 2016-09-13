@@ -7,34 +7,45 @@ package udp.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
- * @author Eivind
+ * @author Eivind Fugledal
  */
-public class GUIData {
+public class GUIData extends Thread {
+    
+    private final DataHandler dataHandler;
     
     private ByteArrayInputStream baos;
     private ObjectInputStream ois;
     
-    private ArrayList<Boolean> list;
+    public GUIData(DataHandler dh)
+    {
+        this.dataHandler = dh;
+    }
     
-    public GUIData()
+    /**
+     * @param data
+     */
+    public void receiveFromUDP(byte[] data)
+    {
+        if(!Arrays.equals(data, dataHandler.getData("gui")))
+            this.setValuesToDataHandler(data);
+    }
+    
+    public void setValuesToDataHandler(byte[] data)
+    {
+        dataHandler.setData(data, "gui");
+    }
+    
+    public void checkValuesFromDataHandler()
     {
         
     }
     
-    /**
-     * Checks for changes in controls
-     * @param data
-     * @throws java.lang.Exception
-     */
-    public void processData(byte[] data) throws Exception
+    public void sendDataToUDP()
     {
-        baos = new ByteArrayInputStream(data);
-        ois = new ObjectInputStream(baos);
-            
-        list = (ArrayList<Boolean>) ois.readObject(); 
+        
     }
 }
