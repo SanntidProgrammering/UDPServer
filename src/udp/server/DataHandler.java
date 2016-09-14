@@ -35,9 +35,6 @@ package udp.server;
  */
 public class DataHandler {
     
-    private final GUIData gui;
-    private final ArduinoData arduino;
-    
     private byte[] toArduino;
     private byte[] fromArduino;
     
@@ -46,14 +43,8 @@ public class DataHandler {
      */
     public DataHandler()
     {
-        gui = new GUIData(this);
-        arduino = new ArduinoData();
-        
         toArduino = new byte[6];
         fromArduino = new byte[6];
-        
-        // Must be the last call in the constructor
-        this.startThreads();
     }
     
     /**
@@ -88,14 +79,5 @@ public class DataHandler {
         notifyAll();
         
         return temp;
-    }
-    
-    /**
-     * Starts thred for GUI receiving/sending and Arduino receiving/sending
-     */
-    private void startThreads()
-    {
-        gui.start();
-        arduino.start();
     }
 }
