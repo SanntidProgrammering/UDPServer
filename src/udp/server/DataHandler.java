@@ -6,7 +6,7 @@
 package udp.server;
 
 /**
- * Overview protocols:
+ * Overview protocol:
  * To Arduino:
  * Byte 0: bit 0 - stopp
  *         bit 1 - fwd
@@ -52,12 +52,22 @@ public class DataHandler {
      * @param data New data set from GUI/Arduino
      * @param id An identifier used to set correct byte array
      */
-    public synchronized void setData(byte[] data, String id)
+    public synchronized void setData(byte[] data, String id) throws IllegalArgumentException
     {
         if(id.toLowerCase().equals("gui"))
-            this.fromGUI = data;
-        if(id.toLowerCase().equals("arduino"))
-            this.fromArduino = data;
+        {
+            if(data.length != fromGUI.length)
+                throw new IllegalArgumentException("Wrong byte array passed to fromGUI");
+            else
+                this.fromGUI = data;
+        }
+        else if(id.toLowerCase().equals("arduino"))
+        {
+            if(data.length != fromArduino.length)
+                throw new IllegalArgumentException("Wrong byte array passed to fromArduino");
+            else
+                this.fromArduino = data;
+        }
         
         notifyAll();
     }
@@ -73,7 +83,7 @@ public class DataHandler {
         
         if(id.toLowerCase().equals("gui"))
             temp = fromGUI;
-        if(id.toLowerCase().equals("arduino"))
+        else if(id.toLowerCase().equals("arduino"))
             temp = fromArduino;
         
         notifyAll();

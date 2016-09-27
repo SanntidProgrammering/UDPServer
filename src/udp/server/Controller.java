@@ -22,6 +22,7 @@ public class Controller implements Runnable {
         arduinoData = new byte[6];
         
         this.start();
+        
     }
     
     /**
@@ -38,11 +39,7 @@ public class Controller implements Runnable {
     {
         this.getData();
         
-        if(this.checkIfAuto())
-        {
-            
-        }
-        else
+        while(!this.checkIfAuto())
         {
             
         }
@@ -101,5 +98,70 @@ public class Controller implements Runnable {
         tempBool = (this.getBit(id, b, bit) != 0);
         
         return tempBool;
+    }
+    
+    /**
+     * Sets the value of a specific bit in a specific byte
+     * @param id A string id used to specify which data that contains the specific bit
+     *           "gui" if data comes from GUI, "arduino" if data comes from Arduino
+     * @param b The specific byte
+     * @param bit The specific bit
+     */
+    private void setBit(String id, int b, int bit)
+    {
+        byte tempByte;
+        
+        if(id.toLowerCase().equals("gui"))
+        {
+            tempByte = guiData[b];
+            tempByte = (byte) (tempByte | (1 << bit));
+            guiData[b] = tempByte;
+        }
+        else if(id.toLowerCase().equals("arduino"))
+        {
+            tempByte = arduinoData[b];
+            tempByte = (byte) (tempByte | (1 << bit));
+            arduinoData[b] = tempByte;
+        }
+    }
+    
+    /**
+     * 
+     */
+    private void stop()
+    {
+        this.setBit("arduino", 0, 0);
+    }
+    
+    /**
+     * 
+     */
+    private void runFWD()
+    {
+        this.setBit("arduino", 0, 1);
+    }
+    
+    /**
+     * 
+     */
+    private void runRev()
+    {
+        this.setBit("arduino", 0, 2);
+    }
+    
+    /**
+     * 
+     */
+    private void runLeft()
+    {
+        this.setBit("arduino", 0, 3);
+    }
+    
+    /**
+     * 
+     */
+    private void runRight()
+    {
+        this.setBit("arduino", 0, 4);
     }
 }
