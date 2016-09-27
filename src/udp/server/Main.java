@@ -14,6 +14,7 @@ public class Main {
     protected static DataHandler dh;
     private static GUIData gd;
     private static ArduinoData ad;
+    private static Controller controller;
     
     /**
      * @param args the command line arguments
@@ -22,6 +23,7 @@ public class Main {
         dh = new DataHandler();
         gd = new GUIData();
         ad = new ArduinoData();
+        controller = new Controller();
         
         gd.start();
         ad.start();

@@ -35,7 +35,7 @@ package udp.server;
  */
 public class DataHandler {
     
-    private byte[] toArduino;
+    private byte[] fromGUI;
     private byte[] fromArduino;
     
     /**
@@ -43,7 +43,7 @@ public class DataHandler {
      */
     public DataHandler()
     {
-        toArduino = new byte[6];
+        fromGUI = new byte[6];
         fromArduino = new byte[6];
     }
     
@@ -55,7 +55,7 @@ public class DataHandler {
     public synchronized void setData(byte[] data, String id)
     {
         if(id.toLowerCase().equals("gui"))
-            this.toArduino = data;
+            this.fromGUI = data;
         if(id.toLowerCase().equals("arduino"))
             this.fromArduino = data;
         
@@ -72,7 +72,7 @@ public class DataHandler {
         byte[] temp = new byte[6];
         
         if(id.toLowerCase().equals("gui"))
-            temp = toArduino;
+            temp = fromGUI;
         if(id.toLowerCase().equals("arduino"))
             temp = fromArduino;
         
