@@ -17,11 +17,14 @@ public class RunThis {
     public static void main(String[] args) {
         try {
             DataHandler dh = new DataHandler();
+            byte[] b = {22,23,24,25,26,27};
+            dh.setData(b, "gui"); 
             SerialComArduino sca = new SerialComArduino(dh);
-            sca.connect("/dev/ttyUSB0");
+            sca.connect("/dev/ttyACM0");
+            //sca.connect("/dev/ttyUSB0");
+            //System.out.println(b);
             
-            byte[] b = {24,25,26,27,27,28};
-            dh.setData(b, "gui");
+           
             
         } catch (Exception ex) {
             Logger.getLogger(RunThis.class.getName()).log(Level.SEVERE, null, ex);

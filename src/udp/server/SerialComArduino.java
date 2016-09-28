@@ -15,12 +15,14 @@ public class SerialComArduino
     Thread reader; // reads from arduino
     Thread writer;  // writes to arduino
     DataHandler datahandler;
+    boolean available;
 
     
     public SerialComArduino(DataHandler datahandler)
     {
         super();
         this.datahandler = datahandler;
+        available=false;
     }
     
     void connect ( String portName ) throws Exception
@@ -37,13 +39,13 @@ public class SerialComArduino
             if ( commPort instanceof SerialPort )
             {
                 SerialPort serialPort = (SerialPort) commPort;
-                serialPort.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+                serialPort.setSerialPortParams(19200,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
                 
                 InputStream in = serialPort.getInputStream();
                 OutputStream out = serialPort.getOutputStream();
                 
-                reader = new Thread(new SerialReader(in,datahandler));
-                writer = new Thread(new SerialWriter(out,datahandler));
+                reader = new Thread(new SerialReader(in,datahandler,this));
+                writer = new Thread(new SerialWriter(out,datahandler,this));
                 reader.start();
                 writer.start();
 
@@ -63,5 +65,49 @@ public class SerialComArduino
         return writer;
     }
     
+    
+    public synchronized void setMessage()
+    {
+        while (available) {
+            try {
+                wait();
+            }
+            catch (InterruptedException e) {
+            }
+                        
+            }
+        
+        available = true;
+        notifyAll();
+    }
+    
+    public synchronized void getMessage()
+    {
+               while (!available) {
+            try {
+                wait();
+            }
+            catch (InterruptedException e) {
+            }
+                        
+            }
+        
+        available = false;
+        notifyAll();
+    }
+    
+    
+    
+    public boolean isAvailable(boolean status)
+    {
+        this.available = status;
+        return this.available;
+    }
+    
 }
     
+
+
+
+
+
