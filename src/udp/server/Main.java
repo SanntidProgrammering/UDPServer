@@ -15,6 +15,7 @@ public class Main {
     private static GUIData gd;
     private static ArduinoData ad;
     private static Controller controller;
+    static SendEventState enumStateEvent;
     
     /**
      * @param args the command line arguments

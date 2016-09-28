@@ -5,8 +5,6 @@
  */
 package udp.server;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.util.Arrays;
 
 /**
@@ -15,8 +13,6 @@ import java.util.Arrays;
  */
 public class GUIData extends Thread {
     
-    private ByteArrayInputStream baos;
-    private ObjectInputStream ois;
     
     public GUIData()
     {
@@ -29,7 +25,7 @@ public class GUIData extends Thread {
      */
     public void receiveFromUDP(byte[] data)
     {
-        if(!Arrays.equals(data, Main.dh.getData("gui")))
+        if(!Arrays.equals(data, Main.dh.getDataFromGui()))
             this.setValuesToDataHandler(data);
     }
     
@@ -39,22 +35,6 @@ public class GUIData extends Thread {
      */
     public void setValuesToDataHandler(byte[] data)
     {
-        Main.dh.setData(data, "gui");
-    }
-    
-    /**
-     * 
-     */
-    public void checkValuesFromDataHandler()
-    {
-        
-    }
-    
-    /**
-     * 
-     */
-    public void sendDataToUDP()
-    {
-        
+        Main.dh.setDataFromGUI(data);
     }
 }

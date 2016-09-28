@@ -5,6 +5,9 @@
  */
 package udp.server;
 
+import java.math.BigInteger;
+import java.util.Arrays;
+
 /**
  * Overview protocol:
  * To Arduino:
@@ -35,276 +38,229 @@ package udp.server;
  */
 public class DataHandler {
     
-    private byte[] GUI;
-    private byte[] Arduino;
-    
-    /**
-     * 
-     */
-    public DataHandler()
-    {
-        GUI = new byte[6];
-        Arduino = new byte[6];
+    private byte[] dataFromArduino;
+    private byte[] dataFromGui;
+    private boolean dataFromArduinoAvaliable = false;
+    private boolean dataFromGuiAvailable = false;
+    private boolean threadStatus;
+    private int pixyXvalue;
+    private int pixyYvalue;
+    private int distanceSensor;
+    private byte requestCodeFromArduino;
+    private boolean enableAUV;
+
+    public DataHandler() {
+        this.dataFromArduino = new byte[6];
+        this.dataFromGui = new byte[6];
+    }
+
+    //*****************************************************************
+    //********** PRIVATE METHODS AREA**********************************
+    private byte setBit(byte b, int bit) {
+        return b |= 1 << bit;
+    }
+
+    private byte releaseBit(byte b, int bit) {
+        return b &= ~(1 << bit);
+    }
+
+    //*****************************************************************
+    //********************** THREAD STATUS METHODS*********************
+    public boolean shouldThreadRun() {
+        return threadStatus;
+    }
+
+    public void setThreadStatus(boolean threadStatus) {
+        this.threadStatus = threadStatus;
+    }
+
+    //*****************************************************************
+    //*************** FROM ARDUINO METHODS*****************************
+    public void handleDataFromArduino(byte[] data) {
+        // check if the array is of the same length and the requestcode has changed
+        if (data.length == this.dataFromArduino.length && data[5] != this.getRequestCodeFromArduino()) {
+            this.dataFromArduino = data;
+            this.setDistanceSensor(data[4]);
+            this.setRequestCodeFromArduino(data[5]);
+            this.setPixyXvalue(new BigInteger(Arrays.copyOfRange(data, 0, 2)).intValue());
+            this.setPixyYvalue(new BigInteger(Arrays.copyOfRange(data, 2, 4)).intValue());
+            this.dataFromArduinoAvaliable = true;
+        }
+    }
+
+    public boolean isDataFromArduinoAvailable() {
+        return this.dataFromArduinoAvaliable;
+    }
+
+    public int getPixyXvalue() {
+        return pixyXvalue;
+    }
+
+    public void setPixyXvalue(int pixyXvalue) {
+        this.pixyXvalue = pixyXvalue;
+    }
+
+    public int getPixyYvalue() {
+        return pixyYvalue;
+    }
+
+    public void setPixyYvalue(int pixyYvalue) {
+        this.pixyYvalue = pixyYvalue;
+    }
+
+    public int getDistanceSensor() {
+        return distanceSensor;
+    }
+
+    public void setDistanceSensor(int distanceSensor) {
+        this.distanceSensor = distanceSensor;
+    }
+
+    public byte getRequestCodeFromArduino() {
+        return requestCodeFromArduino;
+    }
+
+    public void setRequestCodeFromArduino(byte requestCodeFromArduino) {
+        this.requestCodeFromArduino = requestCodeFromArduino;
+    }
+
+    //****************************************************************
+    //************** FROM GUI METHODS*********************************
+    public byte[] getDataFromGui() {
+        Main.enumStateEvent = SendEventState.FALSE;
+        return this.dataFromGui;
     }
     
-    /**
-     * Updates byte arrays when receiving from either GUI or Arduino
-     * @param data New data set from GUI/Arduino
-     * @param id An identifier used to set correct byte array
-     */
-    public synchronized void setData(byte[] data, String id) throws IllegalArgumentException
-    {
-        if(id.toLowerCase().equals("gui"))
-        {
-            if(data.length != GUI.length)
-                throw new IllegalArgumentException("Wrong byte array passed to fromGUI");
-            else
-                this.GUI = data;
-        }
-        else if(id.toLowerCase().equals("arduino"))
-        {
-            if(data.length != Arduino.length)
-                throw new IllegalArgumentException("Wrong byte array passed to fromArduino");
-            else
-                this.Arduino = data;
-        }
-        
+    public void setDataFromGUI(byte[] data) {
+        this.dataFromGui = data;
+        this.fireStateChanged();
+    }
+
+    public void stopAUV() {
+        dataFromGui[0] = this.setBit(dataFromGui[0], 0);
+        this.fireStateChanged();
+    }
+
+    public void releaseStopAUV() {
+        dataFromGui[0] = this.releaseBit(dataFromGui[0], 0);
+        this.fireStateChanged();
+    }
+
+    public void goFwd() {
+        dataFromGui[0] = this.setBit(dataFromGui[0], 1);
+        this.fireStateChanged();
+    }
+
+    public void releaseGoFwd() {
+        dataFromGui[0] = this.releaseBit(dataFromGui[0], 1);
+        this.fireStateChanged();
+    }
+
+    public void goRew() {
+        dataFromGui[0] = this.setBit(dataFromGui[0], 2);
+        this.fireStateChanged();
+    }
+
+    public void releaseGoRew() {
+        dataFromGui[0] = this.releaseBit(dataFromGui[0], 2);
+        this.fireStateChanged();
+    }
+
+    public void goLeft() {
+        dataFromGui[0] = this.setBit(dataFromGui[0], 3);
+        this.fireStateChanged();
+    }
+
+    public void releaseGoLeft() {
+        dataFromGui[0] = this.releaseBit(dataFromGui[0], 3);
+        this.fireStateChanged();
+    }
+
+    public void goRight() {
+        dataFromGui[0] = this.setBit(dataFromGui[0], 4);
+        this.fireStateChanged();
+    }
+
+    public void releaseGoRight() {
+        dataFromGui[0] = this.releaseBit(dataFromGui[0], 4);
+        this.fireStateChanged();
+    }
+
+    public void setLeftMotorSpeed(byte speed) {
+        dataFromGui[1] = speed;
+        this.fireStateChanged();
+    }
+
+    public void setRightMotorSpeed(byte speed) {
+        dataFromGui[2] = speed;
+        this.fireStateChanged();
+    }
+
+    public void setLeftServo() {
+        dataFromGui[3] = this.setBit(dataFromGui[0], 0);
+        this.fireStateChanged();
+    }
+
+    public void resetLeftServo() {
+        dataFromGui[3] = this.releaseBit(dataFromGui[0], 0);
+        this.fireStateChanged();
+    }
+
+    public void setRightServo() {
+        dataFromGui[3] = this.setBit(dataFromGui[0], 1);
+        this.fireStateChanged();
+    }
+
+    public void resetRightServo() {
+        dataFromGui[3] = this.releaseBit(dataFromGui[0], 1);
+        this.fireStateChanged();
+    }
+
+    public void AUVmanualMode() {
+        dataFromGui[3] = this.releaseBit(dataFromGui[0], 2);
+        this.fireStateChanged();
+    }
+
+    public void AUVautoMode() {
+        dataFromGui[3] = this.setBit(dataFromGui[0], 2);
+        this.fireStateChanged();
+    }
+    
+    public byte getAUVautoMode() {
+        return dataFromGui[3];
+    }
+
+    public void enableAUV() {
+        dataFromGui[3] = this.setBit(dataFromGui[0], 3);
+        this.fireStateChanged();
+    }
+
+    public void disableAUV() {
+        dataFromGui[3] = this.releaseBit(dataFromGui[0], 3);
+        this.fireStateChanged();
+    }
+
+    public void setSensitivity(byte sensetivity) {
+        dataFromGui[4] = sensetivity;
+        this.fireStateChanged();
+    }
+
+    public byte getSensitivity() {
+        return dataFromGui[4];
+    }
+
+    public byte getRequestCode() {
+        return dataFromGui[5];
+    }
+
+    public void incrementRequestCode() {
+        dataFromGui[5]++;
+        this.fireStateChanged();
+    }
+
+    public synchronized void fireStateChanged() {
+        Main.enumStateEvent = SendEventState.TRUE;
         notifyAll();
     }
-    
-    /**
-     * Returns a byte array with requested data
-     * @param id An identifier used to return correct byte array
-     * @return The requested byte array
-     */
-    public synchronized byte[] getData(String id)
-    {
-        byte[] temp = new byte[6];
-        
-        if(id.toLowerCase().equals("gui"))
-            temp = GUI;
-        else if(id.toLowerCase().equals("arduino"))
-            temp = Arduino;
-        
-        notifyAll();
-        
-        return temp;
-    }
-    
-    /**
-     * Checks if program set to auto or manual mode
-     * @return true if auto, false if manual
-     */
-    public synchronized boolean getAutoOrManual()
-    {
-        return this.getBitAsBool("gui", 3, 2);
-    }
-    
-    /**
-     * Returns the sensitivity value set in GUI
-     * @return The sensitivity value
-     */
-    public synchronized int getSensitivity()
-    {
-        return this.getUnsignedByteValue("gui", 4);
-    }
-    
-    /**
-     * Set left motor to wanted speed
-     * @param speed Wanted speed
-     */
-    public synchronized void setLeftMotorSpeed(int speed)
-    {
-        this.setByteValue("arduino", 1, (speed/100)*this.getSensitivity());
-    }
-    
-    /**
-     * Set right motor to wanted speed
-     * @param speed Wanted speed
-     */
-    public synchronized void setRightMotorSpeed(int speed)
-    {
-        this.setByteValue("arduino", 2, (speed/100)*this.getSensitivity());
-    }
-    
-    /**
-     * Sets or unsets stop bit
-     * @param stop true to set, false to unset
-     */
-    public synchronized void stop(boolean stop)
-    {
-        if(stop)
-            this.setBit("arduino", 0, 0);
-        else
-            this.unSetBit("arduino", 0, 0);
-    }
-    
-    /**
-     * Sets or unsets run FWD bit
-     * @param run true to set, false to unset
-     */
-    public synchronized void runFWD(boolean run)
-    {
-        if(run)
-            this.setBit("arduino", 0, 1);
-        else
-            this.unSetBit("arduino", 0, 1);
-    }
-    
-    /**
-     * Sets or unsets run reverse bit
-     * @param run true to set, false to unset
-     */
-    public synchronized void runRev(boolean run)
-    {
-        if(run)
-            this.setBit("arduino", 0, 2);
-        else
-            this.unSetBit("arduino", 0, 2);
-    }
-    
-    /**
-     * Sets or unsets run left bit
-     * @param run true to set, false to unset
-     */
-    public synchronized void runLeft(boolean run)
-    {
-        if(run)
-            this.setBit("arduino", 0, 3);
-        else
-            this.unSetBit("arduino", 0, 3);
-    }
-    
-    /**
-     * Sets or unsets run right bit
-     * @param run true to set, false to unset
-     */
-    public synchronized void runRight(boolean run)
-    {
-        if(run)
-            this.setBit("arduino", 0, 4);
-        else
-            this.unSetBit("arduino", 0, 4);
-    }
-    
-    /**
-     * Sets the value of a specific byte
-     * @param id A string id used to specify which data that contains the specific bit
-     *           "gui" if data comes from GUI, "arduino" if data comes from Arduino
-     * @param b The specific byte
-     * @param value Value to be set to the byte
-     */
-    public synchronized void setByteValue(String id, int b, int value)
-    {
-        if(id.toLowerCase().equals("gui"))
-            GUI[b] = (byte) value;
-        else if(id.toLowerCase().equals("arduino"))
-            Arduino[b] = (byte) value;
-    }
-    
-    /**
-     * Returns a unsigned integer with the value from a specific byte
-     * @param id A string id used to specify which data that contains the specific bit
-     *           "gui" if data comes from GUI, "arduino" if data comes from Arduino
-     * @param b The specific byte
-     * @return The unsigned integer value
-     */
-    public synchronized int getUnsignedByteValue(String id, int b)
-    {
-        int tempInt = 0;
-        
-        if(id.toLowerCase().equals("gui"))
-            tempInt = GUI[b] & 0xFF;
-        else if(id.toLowerCase().equals("arduino"))
-            tempInt = Arduino[b] & 0xFF;
-        
-        return tempInt;
-    }
-    
-    /**
-     * Gets the value of a specific bit in a specific byte
-     * @param id A string id used to specify which data that contains the specific bit
-     *           "gui" if data comes from GUI, "arduino" if data comes from Arduino
-     * @param b The specific byte
-     * @param bit The specific bit
-     * @return The requested bit
-     */
-    public synchronized byte getBit(String id, int b, int bit)
-    {
-        byte tempByte = 0;
-        
-        if(id.toLowerCase().equals("gui"))
-            tempByte = GUI[b];
-        else if(id.toLowerCase().equals("arduino"))
-            tempByte = Arduino[b];
-        
-        return (byte) ((tempByte >> bit) & 1);
-    }
-    
-    /**
-     * Converts the value of a specific bit in a specific byte to a boolean value
-     * @param id A string id used to specify which data that contains the specific bit
-     *           "gui" if data comes from GUI, "arduino" if data comes from Arduino
-     * @param b The specific byte
-     * @param bit The specific bit
-     * @return true if bit value equals 1, false if bit value equals 0
-     */
-    public synchronized boolean getBitAsBool(String id, int b, int bit)
-    {
-        boolean tempBool;
-        
-        tempBool = (this.getBit(id, b, bit) != 0);
-        
-        return tempBool;
-    }
-    
-    /**
-     * Sets the value of a specific bit in a specific byte
-     * @param id A string id used to specify which data that contains the specific bit
-     *           "gui" if data comes from GUI, "arduino" if data comes from Arduino
-     * @param b The specific byte
-     * @param bit The specific bit
-     */
-    public synchronized void setBit(String id, int b, int bit)
-    {
-        byte tempByte;
-        
-        if(id.toLowerCase().equals("gui"))
-        {
-            tempByte = GUI[b];
-            tempByte = (byte) (tempByte | (1 << bit));
-            GUI[b] = tempByte;
-        }
-        else if(id.toLowerCase().equals("arduino"))
-        {
-            tempByte = Arduino[b];
-            tempByte = (byte) (tempByte | (1 << bit));
-            Arduino[b] = tempByte;
-        }
-    }
-    
-    /**
-     * Unsets the value of a specific bit in a specific byte
-     * @param id A string id used to specify which data that contains the specific bit
-     *           "gui" if data comes from GUI, "arduino" if data comes from Arduino
-     * @param b The specific byte
-     * @param bit The specific bit
-     */
-    public synchronized void unSetBit(String id, int b, int bit)
-    {
-        byte tempByte;
-        
-        if(id.toLowerCase().equals("gui"))
-        {
-            tempByte = GUI[b];
-            tempByte = (byte) ((byte) tempByte & ~(1 << bit));
-            GUI[b] = tempByte;
-        }
-        else if(id.toLowerCase().equals("arduino"))
-        {
-            tempByte = Arduino[b];
-            tempByte = (byte) ((byte) tempByte & ~(1 << bit));
-            Arduino[b] = tempByte;
-        }
-    }
+
 }

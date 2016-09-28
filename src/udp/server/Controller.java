@@ -30,10 +30,7 @@ public class Controller implements Runnable {
     @Override
     public void run() 
     {
-        if(Main.dh.getAutoOrManual())
-            this.runAuto();
-        else
-            this.runManual();
+        
     }
     
     /**
@@ -41,10 +38,7 @@ public class Controller implements Runnable {
      */
     private void runAuto()
     {
-        while(Main.dh.getAutoOrManual())
-        {
-            
-        }
+        
     }
     
     /**
@@ -52,9 +46,6 @@ public class Controller implements Runnable {
      */
     private void runManual()
     {
-        while(!Main.dh.getAutoOrManual())
-        {
             
-        }
     }
 }
