@@ -19,27 +19,28 @@ package udp.server;
  */
 public class DataHandler {
 
-    private final GUIData gui;
-    private final ArduinoData arduino;
+   // private final GUIData gui;
+   // private final ArduinoData arduino;
 
     private byte[] toArduino;
     private byte[] fromArduino;
 
     private boolean dataflag;
+            
     private boolean keepAliveThreads = true;
 
     /**
      *
      */
     public DataHandler() {
-        gui = new GUIData(this);
-        arduino = new ArduinoData();
+        //gui = new GUIData(this);
+        //arduino = new ArduinoData();
 
         toArduino = new byte[6];
         fromArduino = new byte[6];
-
+        this.dataflag=true;
         // Must be the last call in the constructor
-        this.startThreads();
+        //this.startThreads();
     }
 
     /**
@@ -49,12 +50,20 @@ public class DataHandler {
      * @param id An identifier used to set correct byte array
      */
     public synchronized void setData(byte[] data, String id) {
+
+        // Data from GUI to be sendt to Arduino
         if (id.toLowerCase().equals("gui")) {
             this.toArduino = data;
             this.setDataAvailable(true);
+            
+
         }
+
+        // Data from Arduino to be sendt to GUI
         if (id.toLowerCase().equals("arduino")) {
             this.fromArduino = data;
+            this.setDataAvailable(true);
+
         }
 
         notifyAll();
@@ -69,13 +78,16 @@ public class DataHandler {
     public synchronized byte[] getData(String id) {
         byte[] temp = new byte[6];
 
+        // Get data to be sendt to Arduino
         if (id.toLowerCase().equals("gui")) {
             temp = toArduino;
-            this.set
+            //this.setDataAvailable(false);
         }
+
+        // Get data to be sendt to GUI
         if (id.toLowerCase().equals("arduino")) {
             temp = fromArduino;
-            this.dataflag = false;
+            //this.setDataAvailable(false);
         }
 
         notifyAll();
@@ -85,11 +97,11 @@ public class DataHandler {
 
     /**
      * Starts thred for GUI receiving/sending and Arduino receiving/sending
-     */
+     
     private void startThreads() {
         gui.start();
         arduino.start();
-    }
+    }*/
 
     public boolean isNewDataAvailable() {
         return dataflag;
