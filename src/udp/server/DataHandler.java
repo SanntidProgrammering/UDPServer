@@ -56,20 +56,50 @@ public class DataHandler {
 
     //*****************************************************************
     //********** PRIVATE METHODS AREA**********************************
+    /**
+     * Sets a specific bit in a specific byte to 1
+     * @param b The specific byte
+     * @param bit The specific bit
+     * @return Value of the bit
+     */
     private byte setBit(byte b, int bit) {
         return b |= 1 << bit;
     }
-
+    
+    /**
+     * Sets a specific bit in a specific byte to 1
+     * @param b The specific byte
+     * @param bit The specific bit
+     * @return Value of the bit 
+     */
     private byte releaseBit(byte b, int bit) {
         return b &= ~(1 << bit);
+    }
+    
+    /**
+     * Gets a specific bit in a specific byte
+     * @param b The specific byte
+     * @param bit The specific bit
+     * @return Value of the bit
+     */
+    private byte getBit(byte b, int bit) {
+        return (byte) ((b >> bit) & 1);
     }
 
     //*****************************************************************
     //********************** THREAD STATUS METHODS*********************
+    /**
+     * Returns the threads status
+     * @return The threads status
+     */
     public boolean shouldThreadRun() {
         return threadStatus;
     }
 
+    /**
+     * Sets the threads status
+     * @param threadStatus Thread status
+     */
     public void setThreadStatus(boolean threadStatus) {
         this.threadStatus = threadStatus;
     }
@@ -78,7 +108,7 @@ public class DataHandler {
     //*************** FROM ARDUINO METHODS*****************************
     public void handleDataFromArduino(byte[] data) {
         // check if the array is of the same length and the requestcode has changed
-        if (data.length == this.dataFromArduino.length && data[5] != this.getRequestCodeFromArduino()) {
+        if (data.length == this.dataFromArduino.length && data[ToArduino.commands.REQUEST_FEEDBACK.getValue()] != this.getRequestCodeFromArduino()) {
             this.dataFromArduino = data;
             this.setDistanceSensor(data[4]);
             this.setRequestCodeFromArduino(data[5]);
@@ -88,169 +118,323 @@ public class DataHandler {
         }
     }
 
+    /**
+     * 
+     * @return true if new data available, false if not
+     */
     public boolean isDataFromArduinoAvailable() {
         return this.dataFromArduinoAvaliable;
     }
 
+    /**
+     * Gets x-value from Pixy camera
+     * @return x-value
+     */
     public int getPixyXvalue() {
         return pixyXvalue;
     }
 
+    /**
+     * Sets x-value from Pixy camera
+     * @param pixyXvalue x-value
+     */
     public void setPixyXvalue(int pixyXvalue) {
         this.pixyXvalue = pixyXvalue;
     }
 
+    /**
+     * Gets y-value from Pixy camera
+     * @return y-value
+     */
     public int getPixyYvalue() {
         return pixyYvalue;
     }
 
+    /**
+     * Sets y-value from Pixy camera
+     * @param pixyYvalue y-value
+     */
     public void setPixyYvalue(int pixyYvalue) {
         this.pixyYvalue = pixyYvalue;
     }
 
+    /**
+     * Gets value from distance sensor
+     * @return Distance
+     */
     public int getDistanceSensor() {
         return distanceSensor;
     }
 
+    /**
+     * Sets value from distance sensor
+     * @param distanceSensor Distance
+     */
     public void setDistanceSensor(int distanceSensor) {
         this.distanceSensor = distanceSensor;
     }
 
+    /**
+     * Gets request code from Arduino
+     * @return Request code
+     */
     public byte getRequestCodeFromArduino() {
         return requestCodeFromArduino;
     }
 
+    /**
+     * Sets request code from Arduino
+     * @param requestCodeFromArduino Request code
+     */
     public void setRequestCodeFromArduino(byte requestCodeFromArduino) {
         this.requestCodeFromArduino = requestCodeFromArduino;
     }
 
     //****************************************************************
     //************** FROM GUI METHODS*********************************
+    /**
+     * Gets the byte array containing data from GUI
+     * @return The byte array
+     */
     public byte[] getDataFromGui() {
         Main.enumStateEvent = SendEventState.FALSE;
         return this.dataFromGui;
     }
     
+    /**
+     * Sets the byte array containing data from GUI
+     * @param data New byte array
+     */
     public void setDataFromGUI(byte[] data) {
         this.dataFromGui = data;
         this.fireStateChanged();
     }
 
+    /**
+     * Sets stop bit to high
+     */
     public void stopAUV() {
-        dataFromGui[0] = this.setBit(dataFromGui[0], 0);
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
         this.fireStateChanged();
     }
 
+    /**
+     * Sets stop bit to low
+     */
     public void releaseStopAUV() {
-        dataFromGui[0] = this.releaseBit(dataFromGui[0], 0);
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
         this.fireStateChanged();
     }
 
+    /**
+     * Sets forward bit to high
+     */
     public void goFwd() {
-        dataFromGui[0] = this.setBit(dataFromGui[0], 1);
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
         this.fireStateChanged();
     }
 
+    /**
+     * Sets forward bit to low
+     */
     public void releaseGoFwd() {
-        dataFromGui[0] = this.releaseBit(dataFromGui[0], 1);
-        this.fireStateChanged();
-    }
-
-    public void goRew() {
-        dataFromGui[0] = this.setBit(dataFromGui[0], 2);
-        this.fireStateChanged();
-    }
-
-    public void releaseGoRew() {
-        dataFromGui[0] = this.releaseBit(dataFromGui[0], 2);
-        this.fireStateChanged();
-    }
-
-    public void goLeft() {
-        dataFromGui[0] = this.setBit(dataFromGui[0], 3);
-        this.fireStateChanged();
-    }
-
-    public void releaseGoLeft() {
-        dataFromGui[0] = this.releaseBit(dataFromGui[0], 3);
-        this.fireStateChanged();
-    }
-
-    public void goRight() {
-        dataFromGui[0] = this.setBit(dataFromGui[0], 4);
-        this.fireStateChanged();
-    }
-
-    public void releaseGoRight() {
-        dataFromGui[0] = this.releaseBit(dataFromGui[0], 4);
-        this.fireStateChanged();
-    }
-
-    public void setLeftMotorSpeed(byte speed) {
-        dataFromGui[1] = speed;
-        this.fireStateChanged();
-    }
-
-    public void setRightMotorSpeed(byte speed) {
-        dataFromGui[2] = speed;
-        this.fireStateChanged();
-    }
-
-    public void setLeftServo() {
-        dataFromGui[3] = this.setBit(dataFromGui[0], 0);
-        this.fireStateChanged();
-    }
-
-    public void resetLeftServo() {
-        dataFromGui[3] = this.releaseBit(dataFromGui[0], 0);
-        this.fireStateChanged();
-    }
-
-    public void setRightServo() {
-        dataFromGui[3] = this.setBit(dataFromGui[0], 1);
-        this.fireStateChanged();
-    }
-
-    public void resetRightServo() {
-        dataFromGui[3] = this.releaseBit(dataFromGui[0], 1);
-        this.fireStateChanged();
-    }
-
-    public void AUVmanualMode() {
-        dataFromGui[3] = this.releaseBit(dataFromGui[0], 2);
-        this.fireStateChanged();
-    }
-
-    public void AUVautoMode() {
-        dataFromGui[3] = this.setBit(dataFromGui[0], 2);
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
         this.fireStateChanged();
     }
     
+    /**
+     * Gets value of forward bit
+     * @return Forward bit
+     */
+    public byte getFwd() {
+        return this.getBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
+    }
+
+    /**
+     * Sets reverse bit to high
+     */
+    public void goRev() {
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets reverse bit to low
+     */
+    public void releaseGoRev() {
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
+        this.fireStateChanged();
+    }
+    
+    /**
+     * Gets value of reverse bit
+     * @return Reverse bit
+     */
+    public byte getRev() {
+        return this.getBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
+    }
+
+    /**
+     * Sets left bit to high
+     */
+    public void goLeft() {
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets left bit to low
+     */
+    public void releaseGoLeft() {
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
+        this.fireStateChanged();
+    }
+    
+    /**
+     * Gets value of left bit
+     * @return Left bit
+     */
+    public byte getLeft() {
+        return this.getBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
+    }
+
+    /**
+     * Sets right bit to high
+     */
+    public void goRight() {
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets right bit to low
+     */
+    public void releaseGoRight() {
+        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
+        this.fireStateChanged();
+    }
+    
+    /**
+     * Gets value of right bit
+     * @return Right bit
+     */
+    public byte getRight() {
+        return this.getBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
+    }
+
+    /**
+     * Sets left motor speed
+     * @param speed Speed value between 0-255
+     */
+    public void setLeftMotorSpeed(byte speed) {
+        dataFromGui[ToArduino.LEFT_MOTOR_SPEED.getValue()] = speed;
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets right motor speed
+     * @param speed Speed value between 0-255
+     */
+    public void setRightMotorSpeed(byte speed) {
+        dataFromGui[ToArduino.RIGHT_MOTOR_SPEED.getValue()] = speed;
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets left servo bit to high
+     */
+    public void setLeftServo() {
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.LEFT_SERVO.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets left servo bit to low
+     */
+    public void resetLeftServo() {
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.LEFT_SERVO.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets right servo bit to high
+     */
+    public void setRightServo() {
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.RIGHT_SERVO.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets right servo bit to low
+     */
+    public void resetRightServo() {
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.RIGHT_SERVO.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets the auto/manual mode bit to low, which means that the vehicle is now in manual mode
+     */
+    public void AUVmanualMode() {
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
+        this.fireStateChanged();
+    }
+
+    /**
+     * Sets the auto/manual mode bit to high, which means that the vehicle is now in auto mode
+     */
+    public void AUVautoMode() {
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
+        this.fireStateChanged();
+    }
+    
+    /**
+     * Gets the auto/manual mode bit
+     * @return The auto/manual mode bit
+     */
     public byte getAUVautoMode() {
-        return dataFromGui[3];
+        return this.getBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
     }
 
+    /**
+     * Sets the start bit to high
+     */
     public void enableAUV() {
-        dataFromGui[3] = this.setBit(dataFromGui[0], 3);
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.START.getValue());
         this.fireStateChanged();
     }
 
+    /**
+     * Sets the start bit to low
+     */
     public void disableAUV() {
-        dataFromGui[3] = this.releaseBit(dataFromGui[0], 3);
+        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.START.getValue());
         this.fireStateChanged();
     }
 
-    public void setSensitivity(byte sensetivity) {
-        dataFromGui[4] = sensetivity;
+    /**
+     * Sets the value of sensitivity given from GUI (in percent)
+     * @param sensitivity Value between 0-100 percent
+     */
+    public void setSensitivity(byte sensitivity) {
+        dataFromGui[ToArduino.SENSITIVITY.getValue()] = sensitivity;
         this.fireStateChanged();
     }
 
-    public byte getSensitivity() {
-        return dataFromGui[4];
+    /**
+     * Gets the sensitivity value
+     * @return Sensitivity value, between 0-100
+     */
+    public int getSensitivity() {
+        return dataFromGui[ToArduino.SENSITIVITY.getValue()] & 0xFF;
     }
 
+    /**
+     * Gets the request code
+     * @return The request code
+     */
     public byte getRequestCode() {
-        return dataFromGui[5];
+        return this.getBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.REQUEST_FEEDBACK.getValue());
     }
 
     public void incrementRequestCode() {

@@ -30,7 +30,7 @@ public class Controller implements Runnable {
     @Override
     public void run() 
     {
-        
+        this.runManual();
     }
     
     /**
@@ -46,6 +46,16 @@ public class Controller implements Runnable {
      */
     private void runManual()
     {
-            
+        while(true)
+        {
+            if(1 == Main.dh.getFwd())
+                System.out.println("Running fwd");
+            if(1 == Main.dh.getRev())
+                System.out.println("Running rev");
+            if(1 == Main.dh.getLeft())
+                System.out.println("Running left");
+            if(1 == Main.dh.getRight())
+                System.out.println("Running right");
+        }
     }
 }

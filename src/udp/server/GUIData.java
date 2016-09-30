@@ -25,6 +25,7 @@ public class GUIData extends Thread {
      */
     public void receiveFromUDP(byte[] data)
     {
+        System.out.println("Receiving");
         if(!Arrays.equals(data, Main.dh.getDataFromGui()))
             this.setValuesToDataHandler(data);
     }
