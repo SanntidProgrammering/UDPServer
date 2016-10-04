@@ -46,8 +46,9 @@ public class SerialComArduino
                 
                 reader = new Thread(new SerialReader(in,datahandler,this));
                 writer = new Thread(new SerialWriter(out,datahandler,this));
-                reader.start();
+                
                 writer.start();
+                reader.start();
 
             }
             else
@@ -66,44 +67,7 @@ public class SerialComArduino
     }
     
     
-    public synchronized void setMessage()
-    {
-        while (available) {
-            try {
-                wait();
-            }
-            catch (InterruptedException e) {
-            }
-                        
-            }
-        
-        available = true;
-        notifyAll();
-    }
-    
-    public synchronized void getMessage()
-    {
-               while (!available) {
-            try {
-                wait();
-            }
-            catch (InterruptedException e) {
-            }
-                        
-            }
-        
-        available = false;
-        notifyAll();
-    }
-    
-    
-    
-    public boolean isAvailable(boolean status)
-    {
-        this.available = status;
-        return this.available;
-    }
-    
+
 }
     
 

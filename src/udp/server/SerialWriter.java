@@ -7,6 +7,8 @@ package udp.server;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SerialWriter implements Runnable {
     // stream to arduino
@@ -15,7 +17,7 @@ public class SerialWriter implements Runnable {
     DataHandler datahandler;
     SerialComArduino serialCom;
 
-    public SerialWriter(OutputStream out, DataHandler datahandler,SerialComArduino serialCom) {
+    public SerialWriter(OutputStream out, DataHandler datahandler, SerialComArduino serialCom) {
         this.out = out;
         this.datahandler = datahandler;
         this.serialCom = serialCom;
@@ -23,22 +25,25 @@ public class SerialWriter implements Runnable {
 
     public void run() {
         try {
-             
+
             while (datahandler.shouldThreadRun()) {
-                serialCom.setMessage();
-                
-                if (datahandler.isNewDataAvailable()) {
-                     System.out.println("dette er til arduino");
-                    this.out.write(datahandler.getData("gui"));
-                     System.out.println(datahandler.getData("gui"));
-                     
-               }
-           
-            
+                this.checkSendDataAvailable();
+ 
+                this.out.write(datahandler.getDataFromGui());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public synchronized void checkSendDataAvailable() {
+        while (RunThis.enumStateEvent == SendEventState.FALSE) {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SerialReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        notifyAll();
+    }
 }

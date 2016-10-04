@@ -9,23 +9,43 @@ package udp.server;
  *
  * @author Eivind Fugledal
  */
-public class Controller extends Thread {
+public class Controller implements Runnable {
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args){
-        DataHandler dh = new DataHandler();
-        
-        while(true)
-        {
-            //dh.checkGUIData();
-        }
+    Thread t;
+    
+    public Controller()
+    {
+        this.start();
     }
     
+    /**
+     * Starts the control thread
+     */
+    public void start()
+    {
+        t = new Thread(this, "ControlThread");
+        t.start();
+    }
+
     @Override
-    public void run()
+    public void run() 
     {
         
+    }
+    
+    /**
+     * Logic while running in auto mode
+     */
+    private void runAuto()
+    {
+        
+    }
+    
+    /**
+     * Logic while running in manual mode
+     */
+    private void runManual()
+    {
+            
     }
 }

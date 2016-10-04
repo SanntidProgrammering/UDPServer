@@ -5,8 +5,6 @@
  */
 package udp.server;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.util.Arrays;
 
 /**
@@ -15,37 +13,28 @@ import java.util.Arrays;
  */
 public class GUIData extends Thread {
     
-    private final DataHandler dataHandler;
     
-    private ByteArrayInputStream baos;
-    private ObjectInputStream ois;
-    
-    public GUIData(DataHandler dh)
+    public GUIData()
     {
-        this.dataHandler = dh;
     }
     
     /**
-     * @param data
+     * Checks if data received from UDP have changed compared to the one stored 
+     * in DataHandler.
+     * @param data Data received from UDP
      */
     public void receiveFromUDP(byte[] data)
     {
-        if(!Arrays.equals(data, dataHandler.getData("gui")))
+        if(!Arrays.equals(data, Main.dh.getDataFromGui()))
             this.setValuesToDataHandler(data);
     }
     
+    /**
+     * Updates data stored in DataHandler
+     * @param data Updated data
+     */
     public void setValuesToDataHandler(byte[] data)
     {
-        dataHandler.setData(data, "gui");
-    }
-    
-    public void checkValuesFromDataHandler()
-    {
-        
-    }
-    
-    public void sendDataToUDP()
-    {
-        
+        Main.dh.setDataFromGUI(data);
     }
 }

@@ -5,11 +5,10 @@
  */
 package udp.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import org.apache.commons.io.IOUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SerialReader implements Runnable {
     // data from arduino
@@ -28,13 +27,13 @@ public class SerialReader implements Runnable {
     public void run() {
         try {
             while (datahandler.shouldThreadRun()) {
-                serialCom.getMessage();
-                
+               // serialCom.getMessage();
+
                 int i = in.available();
                 byte[] readBuffer = new byte[i];
                 in.read(readBuffer, 0, i);
                  System.out.println("dette er fra arduino");
-                System.out.println(Arrays.toString(readBuffer));
+                //System.out.println(Arrays.toString(readBuffer));
               
                 
                 
@@ -44,4 +43,6 @@ public class SerialReader implements Runnable {
             e.printStackTrace();
         }
     }
+    
+
 }
