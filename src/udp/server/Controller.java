@@ -48,27 +48,24 @@ public class Controller implements Runnable {
     {
         Main.dh.enableAUV();
         
+        byte rightSpeed = 0;
+        byte leftSpeed = 0;
+        
         while(true)
         {
-            if(1 == Main.dh.getFwd()){
-                System.out.println("Running fwd");
-            }
-            else if (0 == Main.dh.getFwd()){
-                System.out.println("Not Running fwd");
-            }
-            /*
             if(1 == Main.dh.getFwd())
-                System.out.println("Running fwd");
-            else if(0== Main.dh.getFwd())
-                System.out.println("Not running fwd");
+            {
+                rightSpeed = (byte) 255;
+                leftSpeed = (byte) 255;
+            }
+            else if(0 == Main.dh.getFwd())
+            {
+                rightSpeed = (byte) 0;
+                leftSpeed = (byte) 0;
+            }
             
-            if(1 == Main.dh.getRev())
-                System.out.println("Running rev");
-            if(1 == Main.dh.getLeft())
-                System.out.println("Running left");
-            if(1 == Main.dh.getRight())
-                System.out.println("Running right");
-           */
+            Main.dh.setLeftMotorSpeed(leftSpeed);
+            Main.dh.setRightMotorSpeed(rightSpeed);
         }
     }
 }

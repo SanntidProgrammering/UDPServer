@@ -28,6 +28,9 @@ public class Main {
         controller = new Controller();
         server = new UDPServer(gd);
         
+        SerialComArduino sca = new SerialComArduino(dh);
+        sca.connect("/dev/ttyACM0");
+        
         gd.start();
         ad.start();
         controller.start();

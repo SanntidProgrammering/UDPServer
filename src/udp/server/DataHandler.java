@@ -327,7 +327,7 @@ public class DataHandler {
      * @param speed Speed value between 0-255
      */
     public void setLeftMotorSpeed(byte speed) {
-        dataFromGui[ToArduino.LEFT_MOTOR_SPEED.getValue()] = speed;
+        dataFromGui[ToArduino.LEFT_MOTOR_SPEED.getValue()] = (byte) ((speed/100)*this.getSensitivity());
         this.fireStateChanged();
     }
 
@@ -336,7 +336,7 @@ public class DataHandler {
      * @param speed Speed value between 0-255
      */
     public void setRightMotorSpeed(byte speed) {
-        dataFromGui[ToArduino.RIGHT_MOTOR_SPEED.getValue()] = speed;
+        dataFromGui[ToArduino.RIGHT_MOTOR_SPEED.getValue()] = (byte) ((speed/100)*this.getSensitivity());
         this.fireStateChanged();
     }
 
