@@ -15,19 +15,22 @@ public class Main {
     private static GUIData gd;
     private static ArduinoData ad;
     private static Controller controller;
+    private static UDPServer server;
     static SendEventState enumStateEvent;
     
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
         dh = new DataHandler();
         gd = new GUIData();
         ad = new ArduinoData();
         controller = new Controller();
+        server = new UDPServer(gd);
         
         gd.start();
         ad.start();
+        controller.start();
     }
     
 }
