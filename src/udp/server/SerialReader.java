@@ -36,7 +36,7 @@ public class SerialReader implements Runnable {
                 try {
                     semaphore.acquire();
                     dh.handleDataFromArduino(readBuffer);
-                    System.out.println("dette er fra arduino");
+                    System.out.println("semaphore aqured and sending data to datahandler from arduino");
                     System.out.println(Arrays.toString(readBuffer));
                 } catch (InterruptedException ex) {
                     Logger.getLogger(SerialWriter.class.getName()).log(Level.SEVERE, null, ex);
