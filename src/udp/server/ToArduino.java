@@ -16,7 +16,7 @@ public enum ToArduino {
     RIGHT_MOTOR_SPEED(2),
     COMMANDS(3),
     SENSITIVITY(4),
-    RESERVED(5);
+    REQUEST_FEEDBACK(5);
     
     private int value;
        
@@ -50,8 +50,7 @@ public enum ToArduino {
         LEFT_SERVO(0),
         RIGHT_SERVO(1),
         AUTO_MANUAL(2),
-        START(3),
-        REQUEST_FEEDBACK(7);
+        START(3);
         
         private int value;
         

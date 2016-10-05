@@ -7,7 +7,6 @@ package udp.server;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -99,7 +98,7 @@ public class DataHandler {
     //*************** FROM ARDUINO METHODS*****************************
     public void handleDataFromArduino(byte[] data) {
         // check if the array is of the same length and the requestcode has changed
-        if (data.length == this.dataFromArduino.length && data[ToArduino.commands.REQUEST_FEEDBACK.getValue()] != this.getRequestCodeFromArduino()) {
+        if (data.length == this.dataFromArduino.length && data[ToArduino.REQUEST_FEEDBACK.getValue()] != this.getRequestCodeFromArduino()) {
             this.dataFromArduino = data;
             this.setDistanceSensor(data[4]);
             this.setRequestCodeFromArduino(data[5]);
@@ -447,7 +446,7 @@ public class DataHandler {
      * @return The request code
      */
     public byte getRequestCode() {
-        return this.getBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.REQUEST_FEEDBACK.getValue());
+        return this.dataFromGui[ToArduino.REQUEST_FEEDBACK.getValue()];
     }
 
     public void incrementRequestCode() {

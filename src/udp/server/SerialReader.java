@@ -7,42 +7,45 @@ package udp.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SerialReader implements Runnable {
     // data from arduino
 
-    InputStream in;
-    DataHandler datahandler;
-    SerialComArduino serialCom;
+    private final InputStream in;
+    private final DataHandler dh;
+    private final Semaphore semaphore;
 
-    public SerialReader(InputStream in, DataHandler datahandler, SerialComArduino serialCom) {
+    public SerialReader(InputStream in, DataHandler datahandler, Semaphore semaphore) {
         this.in = in;
-        this.datahandler = datahandler;
-        this.serialCom = serialCom;
+        this.dh = datahandler;
+        this.semaphore = semaphore;
     }
 
     @Override
     public void run() {
         try {
-            while (datahandler.shouldThreadRun()) {
-               // serialCom.getMessage();
-
+            while (dh.shouldThreadRun()) {
                 int i = in.available();
                 byte[] readBuffer = new byte[i];
                 in.read(readBuffer, 0, i);
-                 //System.out.println("dette er fra arduino");
-                //System.out.println(Arrays.toString(readBuffer));
-              
                 
-                
-                
+                try {
+                    semaphore.acquire();
+                    dh.handleDataFromArduino(readBuffer);
+                    System.out.println("dette er fra arduino");
+                    System.out.println(Arrays.toString(readBuffer));
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(SerialWriter.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    semaphore.release();
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(SerialReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-
 }

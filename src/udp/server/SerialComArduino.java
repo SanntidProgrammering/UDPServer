@@ -13,17 +13,14 @@ import java.util.concurrent.Semaphore;
 
 public class SerialComArduino
 {
-    Thread reader; // reads from arduino
-    Thread writer;  // writes to arduino
-    DataHandler datahandler;
-    boolean available;
-
+    private Thread reader; // reads from arduino
+    private Thread writer;  // writes to arduino
+    private final DataHandler datahandler;
     
     public SerialComArduino(DataHandler datahandler)
     {
         super();
         this.datahandler = datahandler;
-        available=false;
     }
     
     void connect (String portName, Semaphore semaphore) throws Exception
@@ -46,8 +43,8 @@ public class SerialComArduino
                 InputStream in = serialPort.getInputStream();
                 OutputStream out = serialPort.getOutputStream();
                 
-                reader = new Thread(new SerialReader(in,datahandler,this));
-                writer = new Thread(new SerialWriter(out,datahandler,this, semaphore));
+                reader = new Thread(new SerialReader(in,datahandler, semaphore));
+                writer = new Thread(new SerialWriter(out,datahandler, semaphore));
                 
                 writer.start();
                 reader.start();

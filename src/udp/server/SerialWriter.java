@@ -17,13 +17,11 @@ public class SerialWriter implements Runnable {
 
     private OutputStream out;
     private DataHandler datahandler;
-    private SerialComArduino serialCom;
     private Semaphore semaphore;
 
-    public SerialWriter(OutputStream out, DataHandler datahandler, SerialComArduino serialCom, Semaphore semaphore) {
+    public SerialWriter(OutputStream out, DataHandler datahandler, Semaphore semaphore) {
         this.out = out;
         this.datahandler = datahandler;
-        this.serialCom = serialCom;
         this.semaphore = semaphore;
     }
 
