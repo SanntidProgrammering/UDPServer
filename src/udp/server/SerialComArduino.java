@@ -9,6 +9,7 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.Semaphore;
 
 public class SerialComArduino
 {
@@ -25,8 +26,9 @@ public class SerialComArduino
         available=false;
     }
     
-    void connect ( String portName ) throws Exception
+    void connect (String portName, Semaphore semaphore) throws Exception
     {
+        System.out.println("Connect");
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if ( portIdentifier.isCurrentlyOwned() )
         {
@@ -45,7 +47,7 @@ public class SerialComArduino
                 OutputStream out = serialPort.getOutputStream();
                 
                 reader = new Thread(new SerialReader(in,datahandler,this));
-                writer = new Thread(new SerialWriter(out,datahandler,this));
+                writer = new Thread(new SerialWriter(out,datahandler,this, semaphore));
                 
                 writer.start();
                 reader.start();

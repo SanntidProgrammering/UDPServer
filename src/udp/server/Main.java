@@ -5,6 +5,10 @@
  */
 package udp.server;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.concurrent.Semaphore;
+
 /**
  *
  * @author Eivind Fugledal
@@ -14,26 +18,34 @@ public class Main {
     protected static DataHandler dh;
     private static GUIData gd;
     private static ArduinoData ad;
-    private static Controller controller;
-    private static UDPServer server;
+    private static Thread controller;
+    private static Thread server;
+    private static Semaphore semaphore;
     static SendEventState enumStateEvent;
     
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws Exception{
-        dh = new DataHandler();
-        gd = new GUIData();
-        ad = new ArduinoData();
-        controller = new Controller();
-        server = new UDPServer(gd);
+    public static void main(String[] args){
+        semaphore = new Semaphore(1, true);
         
-        SerialComArduino sca = new SerialComArduino(dh);
-        sca.connect("/dev/ttyACM0");
+        dh = new DataHandler();
+        dh.setThreadStatus(true);
+        
+        gd = new GUIData(dh, semaphore);
+        controller = new Thread(new Controller(dh, semaphore));
+        server = new Thread(new UDPServer(gd));
         
         gd.start();
-        ad.start();
         controller.start();
+        server.start();
+        
+        SerialComArduino sca = new SerialComArduino(dh);
+        try {
+            sca.connect("COM5", semaphore);
+        } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }

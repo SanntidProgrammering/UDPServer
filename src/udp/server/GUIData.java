@@ -6,16 +6,30 @@
 package udp.server;
 
 import java.util.Arrays;
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Eivind Fugledal
  */
 public class GUIData extends Thread {
+    private DataHandler dh;
+    private Semaphore semaphore;
     
     
-    public GUIData()
+    public GUIData(DataHandler dh, Semaphore semaphore)
     {
+        this.dh = dh;
+        this.semaphore = semaphore;
+    }
+    
+    
+    @Override
+    public void run()
+    {
+        
     }
     
     /**
@@ -25,17 +39,17 @@ public class GUIData extends Thread {
      */
     public void receiveFromUDP(byte[] data)
     {
-        System.out.println("Receiving");
-        if(!Arrays.equals(data, Main.dh.getDataFromGui()))
-            this.setValuesToDataHandler(data);
-    }
-    
-    /**
-     * Updates data stored in DataHandler
-     * @param data Updated data
-     */
-    public void setValuesToDataHandler(byte[] data)
-    {
-        Main.dh.setDataFromGUI(data);
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUIData.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //if(!Arrays.equals(data, dh.getDataFromGui())){
+            System.out.println("Data mottatt til GUIData");
+            dh.setDataFromGUI(data);
+        //}
+        
+        semaphore.release();
     }
 }

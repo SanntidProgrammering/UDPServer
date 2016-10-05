@@ -7,37 +7,23 @@ package udp.server;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Overview protocol:
- * To Arduino:
- * Byte 0: bit 0 - stopp
- *         bit 1 - fwd
- *         bit 2 - rev
- *         bit 3 - left
- *         bit 4 - right
- * Byte 1: Left motor speed
- * Byte 2: Right motor speed
- * Byte 3: bit 0 - left servo
- *         bit 1 - right servo
- *         bit 2 - auto/manual
- *         bit 3 - start
- *         bit 7 - request feedback
- * Byte 4: Sensitivity
- * Byte 5: Reserved
- * 
- * From Arduino:
- * Byte 0: Pixy x value low byte
- * Byte 1: Pixy x value high byte
- * Byte 2: Pixy y value low byte
- * Byte 3: Pixy y value high byte
- * Byte 4: Distance sensor 4-30 cm
- * Byte 5: Reserved
- * 
+ * Overview protocol: To Arduino: Byte 0: bit 0 - stopp bit 1 - fwd bit 2 - rev
+ * bit 3 - left bit 4 - right Byte 1: Left motor speed Byte 2: Right motor speed
+ * Byte 3: bit 0 - left servo bit 1 - right servo bit 2 - auto/manual bit 3 -
+ * start bit 7 - request feedback Byte 4: Sensitivity Byte 5: Reserved
+ *
+ * From Arduino: Byte 0: Pixy x value low byte Byte 1: Pixy x value high byte
+ * Byte 2: Pixy y value low byte Byte 3: Pixy y value high byte Byte 4: Distance
+ * sensor 4-30 cm Byte 5: Reserved
+ *
  * @author Eivind Fugledal
  */
 public class DataHandler {
-    
+
     private byte[] dataFromArduino;
     private byte[] dataFromGui;
     private boolean dataFromArduinoAvaliable = false;
@@ -58,6 +44,7 @@ public class DataHandler {
     //********** PRIVATE METHODS AREA**********************************
     /**
      * Sets a specific bit in a specific byte to 1
+     *
      * @param b The specific byte
      * @param bit The specific bit
      * @return Value of the bit
@@ -65,19 +52,21 @@ public class DataHandler {
     private byte setBit(byte b, int bit) {
         return b |= 1 << bit;
     }
-    
+
     /**
      * Sets a specific bit in a specific byte to 1
+     *
      * @param b The specific byte
      * @param bit The specific bit
-     * @return Value of the bit 
+     * @return Value of the bit
      */
     private byte releaseBit(byte b, int bit) {
         return b &= ~(1 << bit);
     }
-    
+
     /**
      * Gets a specific bit in a specific byte
+     *
      * @param b The specific byte
      * @param bit The specific bit
      * @return Value of the bit
@@ -90,6 +79,7 @@ public class DataHandler {
     //********************** THREAD STATUS METHODS*********************
     /**
      * Returns the threads status
+     *
      * @return The threads status
      */
     public boolean shouldThreadRun() {
@@ -98,6 +88,7 @@ public class DataHandler {
 
     /**
      * Sets the threads status
+     *
      * @param threadStatus Thread status
      */
     public void setThreadStatus(boolean threadStatus) {
@@ -119,7 +110,7 @@ public class DataHandler {
     }
 
     /**
-     * 
+     *
      * @return true if new data available, false if not
      */
     public boolean isDataFromArduinoAvailable() {
@@ -128,6 +119,7 @@ public class DataHandler {
 
     /**
      * Gets x-value from Pixy camera
+     *
      * @return x-value
      */
     public int getPixyXvalue() {
@@ -136,6 +128,7 @@ public class DataHandler {
 
     /**
      * Sets x-value from Pixy camera
+     *
      * @param pixyXvalue x-value
      */
     public void setPixyXvalue(int pixyXvalue) {
@@ -144,6 +137,7 @@ public class DataHandler {
 
     /**
      * Gets y-value from Pixy camera
+     *
      * @return y-value
      */
     public int getPixyYvalue() {
@@ -152,6 +146,7 @@ public class DataHandler {
 
     /**
      * Sets y-value from Pixy camera
+     *
      * @param pixyYvalue y-value
      */
     public void setPixyYvalue(int pixyYvalue) {
@@ -160,6 +155,7 @@ public class DataHandler {
 
     /**
      * Gets value from distance sensor
+     *
      * @return Distance
      */
     public int getDistanceSensor() {
@@ -168,6 +164,7 @@ public class DataHandler {
 
     /**
      * Sets value from distance sensor
+     *
      * @param distanceSensor Distance
      */
     public void setDistanceSensor(int distanceSensor) {
@@ -176,6 +173,7 @@ public class DataHandler {
 
     /**
      * Gets request code from Arduino
+     *
      * @return Request code
      */
     public byte getRequestCodeFromArduino() {
@@ -184,6 +182,7 @@ public class DataHandler {
 
     /**
      * Sets request code from Arduino
+     *
      * @param requestCodeFromArduino Request code
      */
     public void setRequestCodeFromArduino(byte requestCodeFromArduino) {
@@ -194,15 +193,17 @@ public class DataHandler {
     //************** FROM GUI METHODS*********************************
     /**
      * Gets the byte array containing data from GUI
+     *
      * @return The byte array
      */
     public byte[] getDataFromGui() {
         Main.enumStateEvent = SendEventState.FALSE;
         return this.dataFromGui;
     }
-    
+
     /**
      * Sets the byte array containing data from GUI
+     *
      * @param data New byte array
      */
     public void setDataFromGUI(byte[] data) {
@@ -241,9 +242,10 @@ public class DataHandler {
         dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
         this.fireStateChanged();
     }
-    
+
     /**
      * Gets value of forward bit
+     *
      * @return Forward bit
      */
     public byte getFwd() {
@@ -265,9 +267,10 @@ public class DataHandler {
         dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
         this.fireStateChanged();
     }
-    
+
     /**
      * Gets value of reverse bit
+     *
      * @return Reverse bit
      */
     public byte getRev() {
@@ -289,9 +292,10 @@ public class DataHandler {
         dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
         this.fireStateChanged();
     }
-    
+
     /**
      * Gets value of left bit
+     *
      * @return Left bit
      */
     public byte getLeft() {
@@ -313,9 +317,10 @@ public class DataHandler {
         dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
         this.fireStateChanged();
     }
-    
+
     /**
      * Gets value of right bit
+     *
      * @return Right bit
      */
     public byte getRight() {
@@ -324,19 +329,21 @@ public class DataHandler {
 
     /**
      * Sets left motor speed
+     *
      * @param speed Speed value between 0-255
      */
     public void setLeftMotorSpeed(byte speed) {
-        dataFromGui[ToArduino.LEFT_MOTOR_SPEED.getValue()] = (byte) ((speed/100)*this.getSensitivity());
+        dataFromGui[ToArduino.LEFT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
     }
 
     /**
      * Sets right motor speed
+     *
      * @param speed Speed value between 0-255
      */
     public void setRightMotorSpeed(byte speed) {
-        dataFromGui[ToArduino.RIGHT_MOTOR_SPEED.getValue()] = (byte) ((speed/100)*this.getSensitivity());
+        dataFromGui[ToArduino.RIGHT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
     }
 
@@ -373,7 +380,8 @@ public class DataHandler {
     }
 
     /**
-     * Sets the auto/manual mode bit to low, which means that the vehicle is now in manual mode
+     * Sets the auto/manual mode bit to low, which means that the vehicle is now
+     * in manual mode
      */
     public void AUVmanualMode() {
         dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
@@ -381,15 +389,17 @@ public class DataHandler {
     }
 
     /**
-     * Sets the auto/manual mode bit to high, which means that the vehicle is now in auto mode
+     * Sets the auto/manual mode bit to high, which means that the vehicle is
+     * now in auto mode
      */
     public void AUVautoMode() {
         dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
         this.fireStateChanged();
     }
-    
+
     /**
      * Gets the auto/manual mode bit
+     *
      * @return The auto/manual mode bit
      */
     public byte getAUVautoMode() {
@@ -414,6 +424,7 @@ public class DataHandler {
 
     /**
      * Sets the value of sensitivity given from GUI (in percent)
+     *
      * @param sensitivity Value between 0-100 percent
      */
     public void setSensitivity(byte sensitivity) {
@@ -423,6 +434,7 @@ public class DataHandler {
 
     /**
      * Gets the sensitivity value
+     *
      * @return Sensitivity value, between 0-100
      */
     public int getSensitivity() {
@@ -431,6 +443,7 @@ public class DataHandler {
 
     /**
      * Gets the request code
+     *
      * @return The request code
      */
     public byte getRequestCode() {
@@ -442,9 +455,12 @@ public class DataHandler {
         this.fireStateChanged();
     }
 
-    public synchronized void fireStateChanged() {
+    public void fireStateChanged() {
         Main.enumStateEvent = SendEventState.TRUE;
-        notifyAll();
+        //notifyAll();
     }
 
+    public boolean checkSendDataAvailable() {
+        return Main.enumStateEvent == SendEventState.TRUE;
+    }
 }

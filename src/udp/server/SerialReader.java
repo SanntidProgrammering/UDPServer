@@ -32,7 +32,7 @@ public class SerialReader implements Runnable {
                 int i = in.available();
                 byte[] readBuffer = new byte[i];
                 in.read(readBuffer, 0, i);
-                 System.out.println("dette er fra arduino");
+                 //System.out.println("dette er fra arduino");
                 //System.out.println(Arrays.toString(readBuffer));
               
                 
