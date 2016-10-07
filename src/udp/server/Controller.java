@@ -18,8 +18,8 @@ public class Controller implements Runnable {
     private DataHandler dh;
     private Semaphore semaphore;
     
-    byte rightSpeed = 0;
-    byte leftSpeed = 0;
+    int rightSpeed = 0;
+    int leftSpeed = 0;
     boolean speedChanged = false;
 
     Thread t;
@@ -71,10 +71,7 @@ public class Controller implements Runnable {
                 this.stop();
             }
             
-            if((leftSpeed != dh.getLeftMotorSpeed()) && (rightSpeed != dh.getRightMotorSpeed()))
-                speedChanged = true;
-            else
-                speedChanged = false;
+            speedChanged = (leftSpeed != dh.getLeftMotorSpeed()) && (rightSpeed != dh.getRightMotorSpeed());
             
             if(speedChanged)
             {
@@ -88,40 +85,50 @@ public class Controller implements Runnable {
     
     private void runFWD()
     {
-        rightSpeed = (byte) 255;
-        leftSpeed = (byte) 255;
+        rightSpeed = 255;
+        leftSpeed = 255;
+        
+        dh.releaseStopAUV();
         
         speedChanged = true;
     }
     
     private void runRev()
     {
-        rightSpeed = (byte) 255;
-        leftSpeed = (byte) 255;
+        rightSpeed = 255;
+        leftSpeed = 255;
+        
+        dh.releaseStopAUV();
         
         speedChanged = true;
     }
     
     private void runLeft()
     {
-        rightSpeed = (byte) 255;
-        leftSpeed = (byte) 0;
+        rightSpeed = 255;
+        leftSpeed = 0;
+        
+        dh.releaseStopAUV();
         
         speedChanged = true;
     }
     
     private void runRight()
     {
-        rightSpeed = (byte) 0;
-        leftSpeed = (byte) 255;
+        rightSpeed = 0;
+        leftSpeed = 255;
+        
+        dh.releaseStopAUV();
         
         speedChanged = true;
     }
     
     private void stop()
     {
-        rightSpeed = (byte) 0;
-        leftSpeed = (byte) 0;
+        rightSpeed = 0;
+        leftSpeed = 0;
+        
+        dh.stopAUV();
         
         speedChanged = true;
     }
