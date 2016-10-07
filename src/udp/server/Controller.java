@@ -55,6 +55,8 @@ public class Controller implements Runnable {
                 Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
             }
             
+            if(dh.getDataFromGuiAvailable())
+            {
             if(0 != dh.getByte((byte) 0))
             {
                 if(1 == dh.getFwd())
@@ -71,12 +73,17 @@ public class Controller implements Runnable {
                 this.stop();
             }
             
-            speedChanged = (leftSpeed != dh.getLeftMotorSpeed()) && (rightSpeed != dh.getRightMotorSpeed());
+            speedChanged = ((byte) leftSpeed != dh.getLeftMotorSpeed()) || ((byte) rightSpeed != dh.getRightMotorSpeed());
+            //System.out.println(leftSpeed + " " + dh.getLeftMotorSpeed());
+            //System.out.println(rightSpeed + " " + dh.getRightMotorSpeed());
             
-            if(speedChanged)
-            {
+            //if(speedChanged)
+            //{
                 dh.setLeftMotorSpeed(leftSpeed);
                 dh.setRightMotorSpeed(rightSpeed);
+            //}
+            
+            dh.setDataFromGuiAvailable(false);
             }
             
             semaphore.release();

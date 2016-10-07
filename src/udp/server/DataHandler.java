@@ -211,11 +211,23 @@ public class DataHandler {
     public void setDataFromGUI(byte[] data) {
         this.dataFromGui = data;
         
+        this.dataFromGuiAvailable = true;
+        
         this.dataToArduino[ToArduino.CONTROLS.getValue()] = this.dataFromGui[ToArduino.CONTROLS.getValue()];
         this.dataToArduino[ToArduino.COMMANDS.getValue()] = this.dataFromGui[ToArduino.COMMANDS.getValue()];
         this.dataToArduino[ToArduino.SENSITIVITY.getValue()] = this.dataFromGui[ToArduino.SENSITIVITY.getValue()];
         
         this.fireStateChanged();
+    }
+    
+    public void setDataFromGuiAvailable(boolean state)
+    {
+        this.dataFromGuiAvailable = state;
+    }
+    
+    public boolean getDataFromGuiAvailable()
+    {
+        return this.dataFromGuiAvailable;
     }
     
     public byte getByte(byte b)
@@ -349,9 +361,12 @@ public class DataHandler {
         this.fireStateChanged();
     }
     
-    public byte getLeftMotorSpeed()
+    public int getLeftMotorSpeed()
     {
-        return dataToArduino[ToArduino.LEFT_MOTOR_SPEED.getValue()];
+        if(this.getSensitivity() == 0)
+            return 0;
+        else
+            return dataToArduino[ToArduino.LEFT_MOTOR_SPEED.getValue()] * (100 / this.getSensitivity());
     }
 
     /**
@@ -364,9 +379,12 @@ public class DataHandler {
         this.fireStateChanged();
     }
     
-    public byte getRightMotorSpeed()
+    public int getRightMotorSpeed()
     {
-        return dataToArduino[ToArduino.RIGHT_MOTOR_SPEED.getValue()];
+        if(this.getSensitivity() == 0)
+            return 0;
+        else
+            return dataToArduino[ToArduino.RIGHT_MOTOR_SPEED.getValue()] * (100 / this.getSensitivity());
     }
 
     /**
