@@ -7,7 +7,6 @@ package udp.server;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 /**
  * Overview protocol: To Arduino: Byte 0: bit 0 - stopp bit 1 - fwd bit 2 - rev

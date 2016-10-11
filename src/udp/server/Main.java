@@ -17,7 +17,6 @@ public class Main {
     
     protected static DataHandler dh;
     private static GUIData gd;
-    private static ArduinoData ad;
     private static Thread controller;
     private static Thread server;
     private static Semaphore semaphore;

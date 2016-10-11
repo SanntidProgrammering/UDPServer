@@ -55,18 +55,7 @@ public class SerialComArduino
                 System.out.println("Error: Only serial ports are handled by this example.");
             }
         }     
-    }
-
-    public Thread getReader() {
-        return reader;
-    }
-
-    public Thread getWriter() {
-        return writer;
-    }
-    
-    
-
+    }   
 }
     
 
