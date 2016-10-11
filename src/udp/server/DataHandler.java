@@ -196,7 +196,7 @@ public class DataHandler {
      *
      * @return The byte array
      */
-    public byte[] getDataFromGui() {
+    public byte[] getDataFromController() {
         Main.enumStateEvent = SendEventState.FALSE;
         return this.dataToArduino;
     }
@@ -519,7 +519,7 @@ public class DataHandler {
     }
 
     public void incrementRequestCode() {
-        dataFromGui[5]++;
+        dataToArduino[5]++;
         this.fireStateChanged();
     }
 

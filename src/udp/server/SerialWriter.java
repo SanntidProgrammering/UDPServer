@@ -37,7 +37,7 @@ public class SerialWriter implements Runnable {
                 
                 if(datahandler.checkSendDataAvailable())
                 {
-                    byte[] sendByte = datahandler.getDataFromGui();
+                    byte[] sendByte = datahandler.getDataFromController();
                     System.out.println(Arrays.toString(sendByte) + "SERIAL");
                     this.out.write(sendByte);
                 }

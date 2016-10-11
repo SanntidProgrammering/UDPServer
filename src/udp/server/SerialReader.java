@@ -33,7 +33,7 @@ public class SerialReader implements Runnable {
     @Override
     public void run() {
         int nRead;
-        byte[] data = new byte[6];
+        byte[] data = new byte[24];
         try {
             while (dh.shouldThreadRun()) {
                 while((nRead = in.read(data, 0 , data.length)) != -1){

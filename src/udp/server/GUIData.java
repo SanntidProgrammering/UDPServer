@@ -45,7 +45,7 @@ public class GUIData extends Thread {
             Logger.getLogger(GUIData.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        //if(!Arrays.equals(data, dh.getDataFromGui())){
+        //if(!Arrays.equals(data, dh.getDataFromController())){
             System.out.println("Data mottatt til GUIData");
             dh.setDataFromGUI(data);
         //}

@@ -47,6 +47,25 @@ public class Controller implements Runnable {
      */
     private void runManual() {
         
+        Runnable run = new Runnable() {
+            public void run()
+            {
+                try {
+                    while(true)
+                    {
+                        dh.incrementRequestCode();
+                        Thread.sleep(1000);
+                    }
+                    
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        };
+        
+        new Thread(run).start();
+        
         while (true) {
             
             try {
