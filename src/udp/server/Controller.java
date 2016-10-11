@@ -20,6 +20,8 @@ public class Controller implements Runnable {
     
     int rightSpeed = 0;
     int leftSpeed = 0;
+    int maxSpeed = 255;
+    int minSpeed = 0;
 
     Thread t;
 
@@ -55,21 +57,35 @@ public class Controller implements Runnable {
             
             if(dh.getDataFromGuiAvailable())
             {
-                if(1 != dh.getStopAUV())
+                if(dh.isDataFromArduinoAvailable())
                 {
-                    if(1 == dh.getFwd())
-                       this.runFWD();
-                    else if(1 == dh.getRev())
-                      this.runRev();
-                    else if(1 == dh.getLeft())
-                      this.runLeft();
-                    else if(1 == dh.getRight())
-                      this.runRight();
+                    System.out.println("Pixy x value: " + dh.getPixyXvalue());
+                    System.out.println("Pixy y value: " + dh.getPixyYvalue());
+                    System.out.println("Distance: " + dh.getDistanceSensor());
                 }
-            else 
-            {
-                this.stop();
-            }
+                
+                if(0 != dh.getByte((byte) 0))
+                {
+                    if(!(((1 == dh.getFwd()) && (1 == dh.getRev())) || ((1 == dh.getLeft()) && (1 == dh.getRight()))))
+                    {
+                        if(1 == dh.getFwd())
+                            this.runFWD();
+                        else if(1 == dh.getRev())
+                            this.runRev();
+                        else if(1 == dh.getLeft())
+                            this.runLeft();
+                        else if(1 == dh.getRight())
+                            this.runRight();
+                    }
+                    else
+                    {
+                        this.stop();
+                    }
+                }
+                else 
+                {
+                    this.stop();
+                }
             
                 dh.setLeftMotorSpeed(leftSpeed);
                 dh.setRightMotorSpeed(rightSpeed);
@@ -86,8 +102,8 @@ public class Controller implements Runnable {
      */
     private void runFWD()
     {
-        rightSpeed = 255;
-        leftSpeed = 255;
+        rightSpeed = maxSpeed;
+        leftSpeed = maxSpeed;
         
         dh.releaseStopAUV();
     }
@@ -97,30 +113,54 @@ public class Controller implements Runnable {
      */
     private void runRev()
     {
-        rightSpeed = 255;
-        leftSpeed = 255;
+        rightSpeed = maxSpeed;
+        leftSpeed = maxSpeed;
         
         dh.releaseStopAUV();
     }
     
     /**
      * Sets motor speed to run left
+     * 
+     * If running forward or reverse and left at the same time, left motor should run
+     * with half the speed compared to the right 
+     * If only running left, right motor run at full speed
      */
     private void runLeft()
     {
-        rightSpeed = 255;
-        leftSpeed = 0;
+        if((1 == dh.getFwd()) || (1 == dh.getRev()))
+        {
+            rightSpeed = maxSpeed;
+            leftSpeed = rightSpeed/2;
+        }
+        else
+        {
+            rightSpeed = maxSpeed;
+            leftSpeed = minSpeed;
+        }
         
         dh.releaseStopAUV();
     }
     
     /**
      * Sets motor speed to run right
+     * 
+     * If running forward or reverse and right at the same time, left motor should run
+     * with half the speed compared to the left 
+     * If only running right, left motor run at full speed
      */
     private void runRight()
     {
-        rightSpeed = 0;
-        leftSpeed = 255;
+        if((1 == dh.getFwd()) || (1 == dh.getRev()))
+        {
+            leftSpeed = maxSpeed;
+            rightSpeed = leftSpeed/2;
+        }
+        else
+        {
+            rightSpeed = minSpeed;
+            leftSpeed = maxSpeed;
+        }
         
         dh.releaseStopAUV();
     }
@@ -130,8 +170,8 @@ public class Controller implements Runnable {
      */
     private void stop()
     {
-        rightSpeed = 0;
-        leftSpeed = 0;
+        rightSpeed = minSpeed;
+        leftSpeed = minSpeed;
         
         dh.stopAUV();
     }
