@@ -65,27 +65,62 @@ public class Controller implements Runnable {
                     System.out.println("Distance: " + dh.getDistanceSensor());
                 }
                 
-                if(0 != dh.getByte((byte) 0))
+                switch(this.handleButtonStates())
                 {
-                    if(!(((1 == dh.getFwd()) && (1 == dh.getRev())) || ((1 == dh.getLeft()) && (1 == dh.getRight()))))
-                    {
-                        if(1 == dh.getFwd())
-                            this.runFWD();
-                        else if(1 == dh.getRev())
-                            this.runRev();
-                        else if(1 == dh.getLeft())
-                            this.runLeft();
-                        else if(1 == dh.getRight())
-                            this.runRight();
-                    }
-                    else
-                    {
-                        this.stop();
-                    }
-                }
-                else 
-                {
-                    this.stop();
+                    case 0:
+                        leftSpeed = minSpeed;
+                        rightSpeed = minSpeed;
+                        dh.resetToArduinoByte(0);
+                        dh.stopAUV();
+                        break;
+                    case 1:
+                        leftSpeed = maxSpeed;
+                        rightSpeed = maxSpeed;
+                        dh.resetToArduinoByte(0);
+                        dh.goFwd();
+                        break;
+                    case -1:
+                        leftSpeed = maxSpeed;
+                        rightSpeed = maxSpeed;
+                        dh.resetToArduinoByte(0);
+                        dh.goRev();
+                        break;
+                    case 10:
+                        leftSpeed = maxSpeed;
+                        rightSpeed = maxSpeed;
+                        dh.resetToArduinoByte(0);
+                        dh.goLeft();
+                        break;
+                    case 20:
+                        leftSpeed = maxSpeed;
+                        rightSpeed = maxSpeed;
+                        dh.resetToArduinoByte(0);
+                        dh.goRight();
+                        break;
+                    case 21:
+                        leftSpeed = maxSpeed/4;
+                        rightSpeed = maxSpeed;
+                        dh.resetToArduinoByte(0);
+                        dh.goFwd();
+                        break;
+                    case 11:
+                        leftSpeed = maxSpeed;
+                        rightSpeed = maxSpeed/4;
+                        dh.resetToArduinoByte(0);
+                        dh.goFwd();
+                        break;
+                    case 9:
+                        leftSpeed = maxSpeed;
+                        rightSpeed = maxSpeed/4;
+                        dh.resetToArduinoByte(0);
+                        dh.goRev();
+                        break;
+                    case 19:
+                        leftSpeed = maxSpeed/4;
+                        rightSpeed = maxSpeed;
+                        dh.resetToArduinoByte(0);
+                        dh.goRev();
+                        break;
                 }
             
                 dh.setLeftMotorSpeed(leftSpeed);
@@ -98,6 +133,39 @@ public class Controller implements Runnable {
         }
     }
     
+    private int handleButtonStates()
+    {
+        int returnState = 0;
+        
+        if(0 != dh.getFromGuiByte((byte) 0))
+        {
+            if(!(((1 == dh.getFwd()) && (1 == dh.getRev())) || ((1 == dh.getLeft()) && (1 == dh.getRight()))))
+            {
+                if(1 == dh.getFwd())
+                    returnState = 1;
+                else if(1 == dh.getRev())
+                    returnState = -1;
+                else
+                    returnState = 0;
+                
+                if(1 == dh.getLeft())
+                    returnState += 10;
+                else if(1 == dh.getRight())
+                    returnState += 20;
+            }
+            else
+            {
+                returnState = 0;
+            }
+        }
+        else
+        {
+            returnState = 0;
+        }
+        
+        return returnState;
+    }
+    
     /**
      * Sets motor speed to run forward
      */
@@ -105,6 +173,8 @@ public class Controller implements Runnable {
     {
         rightSpeed = maxSpeed;
         leftSpeed = maxSpeed;
+        
+        dh.goFwd();
         
         dh.releaseStopAUV();
     }
@@ -116,6 +186,8 @@ public class Controller implements Runnable {
     {
         rightSpeed = maxSpeed;
         leftSpeed = maxSpeed;
+        
+        dh.goRev();
         
         dh.releaseStopAUV();
     }
@@ -133,11 +205,15 @@ public class Controller implements Runnable {
         {
             rightSpeed = maxSpeed;
             leftSpeed = rightSpeed/2;
+            
+            dh.goFwd();
         }
         else
         {
             rightSpeed = maxSpeed;
-            leftSpeed = minSpeed;
+            leftSpeed = maxSpeed;
+            
+            dh.goLeft();
         }
         
         dh.releaseStopAUV();
@@ -156,11 +232,15 @@ public class Controller implements Runnable {
         {
             leftSpeed = maxSpeed;
             rightSpeed = leftSpeed/2;
+            
+            dh.goFwd();
         }
         else
         {
-            rightSpeed = minSpeed;
+            rightSpeed = maxSpeed;
             leftSpeed = maxSpeed;
+            
+            dh.goRight();
         }
         
         dh.releaseStopAUV();

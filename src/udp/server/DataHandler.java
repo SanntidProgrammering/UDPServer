@@ -212,7 +212,7 @@ public class DataHandler {
         this.setDataFromGuiAvailable(true);
         
         // Values below should be equal in both dataFromGui and dataToArduino
-        this.dataToArduino[ToArduino.CONTROLS.getValue()] = this.dataFromGui[ToArduino.CONTROLS.getValue()];
+        //this.dataToArduino[ToArduino.CONTROLS.getValue()] = this.dataFromGui[ToArduino.CONTROLS.getValue()];
         this.dataToArduino[ToArduino.COMMANDS.getValue()] = this.dataFromGui[ToArduino.COMMANDS.getValue()];
         this.dataToArduino[ToArduino.SENSITIVITY.getValue()] = this.dataFromGui[ToArduino.SENSITIVITY.getValue()];
         
@@ -243,9 +243,14 @@ public class DataHandler {
      * @param b The specific byte
      * @return The byte
      */
-    public byte getByte(byte b)
+    public byte getFromGuiByte(byte b)
     {
         return dataFromGui[b];
+    }
+    
+    public void resetToArduinoByte(int i)
+    {
+        dataToArduino[i] = 0;
     }
 
     /**
