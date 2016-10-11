@@ -29,23 +29,21 @@ public class SerialReader implements Runnable {
 
     @Override
     public void run() {
-        try {
-            while (dh.shouldThreadRun()) {
-                try {
-                    byte[] data = IOUtils.toByteArray(in);
-                    
-                    semaphore.acquire();
-                    dh.handleDataFromArduino(data);
-                    System.out.println("semaphore aqured and sending data to datahandler from arduino");
-                    System.out.println(Arrays.toString(data));
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(SerialWriter.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    semaphore.release();
-                }
+        while (dh.shouldThreadRun()) {
+            try {
+                byte[] data = IOUtils.toByteArray(in);
+                
+                semaphore.acquire();
+                dh.handleDataFromArduino(data);
+                System.out.println("semaphore aqured and sending data to datahandler from arduino");
+                System.out.println(Arrays.toString(data));
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SerialWriter.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(SerialReader.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                semaphore.release();
             }
-        } catch (IOException ex) {
-            Logger.getLogger(SerialReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
