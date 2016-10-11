@@ -51,6 +51,7 @@ public class Controller implements Runnable {
             
             try {
                 semaphore.acquire();
+                
             } catch (InterruptedException ex) {
                 Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
             }
