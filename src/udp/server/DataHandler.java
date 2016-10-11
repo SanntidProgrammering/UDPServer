@@ -211,8 +211,9 @@ public class DataHandler {
     public void setDataFromGUI(byte[] data) {
         this.dataFromGui = data;
         
-        this.dataFromGuiAvailable = true;
+        this.setDataFromGuiAvailable(true);
         
+        // Values below should be equal in both dataFromGui and dataToArduino
         this.dataToArduino[ToArduino.CONTROLS.getValue()] = this.dataFromGui[ToArduino.CONTROLS.getValue()];
         this.dataToArduino[ToArduino.COMMANDS.getValue()] = this.dataFromGui[ToArduino.COMMANDS.getValue()];
         this.dataToArduino[ToArduino.SENSITIVITY.getValue()] = this.dataFromGui[ToArduino.SENSITIVITY.getValue()];
@@ -220,16 +221,30 @@ public class DataHandler {
         this.fireStateChanged();
     }
     
+    /**
+     * Sets boolean flag to true or false depending on if there are new data
+     * available from GUI or not
+     * @param state true or false
+     */
     public void setDataFromGuiAvailable(boolean state)
     {
         this.dataFromGuiAvailable = state;
     }
     
+    /**
+     * Returns boolean flag
+     * @return true if new data available, false if not
+     */
     public boolean getDataFromGuiAvailable()
     {
         return this.dataFromGuiAvailable;
     }
     
+    /**
+     * Returns a specific byte from byte array from GUI
+     * @param b The specific byte
+     * @return The byte
+     */
     public byte getByte(byte b)
     {
         return dataFromGui[b];
@@ -249,6 +264,16 @@ public class DataHandler {
     public void releaseStopAUV() {
         dataToArduino[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
         //this.fireStateChanged();
+    }
+    
+    /**
+     * Gets value of stop bit
+     *
+     * @return stop bit
+     */
+    public byte getStopAUV()
+    {
+        return this.getBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
     }
 
     /**

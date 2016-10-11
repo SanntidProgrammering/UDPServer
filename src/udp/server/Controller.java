@@ -20,7 +20,6 @@ public class Controller implements Runnable {
     
     int rightSpeed = 0;
     int leftSpeed = 0;
-    boolean speedChanged = false;
 
     Thread t;
 
@@ -31,7 +30,6 @@ public class Controller implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Controller is running");
         this.runManual();
     }
 
@@ -57,86 +55,84 @@ public class Controller implements Runnable {
             
             if(dh.getDataFromGuiAvailable())
             {
-            if(0 != dh.getByte((byte) 0))
-            {
-                if(1 == dh.getFwd())
-                    this.runFWD();
-                else if(1 == dh.getRev())
-                    this.runRev();
-                else if(1 == dh.getLeft())
-                    this.runLeft();
-                else if(1 == dh.getRight())
-                    this.runRight();
-            }
+                if(1 != dh.getStopAUV())
+                {
+                    if(1 == dh.getFwd())
+                       this.runFWD();
+                    else if(1 == dh.getRev())
+                      this.runRev();
+                    else if(1 == dh.getLeft())
+                      this.runLeft();
+                    else if(1 == dh.getRight())
+                      this.runRight();
+                }
             else 
             {
                 this.stop();
             }
             
-            speedChanged = ((byte) leftSpeed != dh.getLeftMotorSpeed()) || ((byte) rightSpeed != dh.getRightMotorSpeed());
-            //System.out.println(leftSpeed + " " + dh.getLeftMotorSpeed());
-            //System.out.println(rightSpeed + " " + dh.getRightMotorSpeed());
-            
-            //if(speedChanged)
-            //{
                 dh.setLeftMotorSpeed(leftSpeed);
                 dh.setRightMotorSpeed(rightSpeed);
-            //}
             
-            dh.setDataFromGuiAvailable(false);
+                dh.setDataFromGuiAvailable(false);
             }
             
             semaphore.release();
         }
     }
     
+    /**
+     * Sets motor speed to run forward
+     */
     private void runFWD()
     {
         rightSpeed = 255;
         leftSpeed = 255;
         
         dh.releaseStopAUV();
-        
-        speedChanged = true;
     }
     
+    /**
+     * Sets motor speed to run reverse
+     */
     private void runRev()
     {
         rightSpeed = 255;
         leftSpeed = 255;
         
         dh.releaseStopAUV();
-        
-        speedChanged = true;
     }
     
+    /**
+     * Sets motor speed to run left
+     */
     private void runLeft()
     {
         rightSpeed = 255;
         leftSpeed = 0;
         
         dh.releaseStopAUV();
-        
-        speedChanged = true;
     }
     
+    /**
+     * Sets motor speed to run right
+     */
     private void runRight()
     {
         rightSpeed = 0;
         leftSpeed = 255;
         
         dh.releaseStopAUV();
-        
-        speedChanged = true;
     }
     
+    /**
+     * Sets motor speed zero/stop
+     */
     private void stop()
     {
         rightSpeed = 0;
         leftSpeed = 0;
         
         dh.stopAUV();
-        
-        speedChanged = true;
     }
 }
