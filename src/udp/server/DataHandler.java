@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 public class DataHandler {
 
     private byte[] dataFromArduino;
+    private byte[] dataToArduino;
     private byte[] dataFromGui;
     private boolean dataFromArduinoAvaliable = false;
     private boolean dataFromGuiAvailable = false;
@@ -36,6 +37,7 @@ public class DataHandler {
 
     public DataHandler() {
         this.dataFromArduino = new byte[6];
+        this.dataToArduino = new byte[6];
         this.dataFromGui = new byte[6];
     }
 
@@ -197,7 +199,7 @@ public class DataHandler {
      */
     public byte[] getDataFromGui() {
         Main.enumStateEvent = SendEventState.FALSE;
-        return this.dataFromGui;
+        return this.dataToArduino;
     }
 
     /**
@@ -207,30 +209,77 @@ public class DataHandler {
      */
     public void setDataFromGUI(byte[] data) {
         this.dataFromGui = data;
+        
+        this.setDataFromGuiAvailable(true);
+        
+        // Values below should be equal in both dataFromGui and dataToArduino
+        this.dataToArduino[ToArduino.CONTROLS.getValue()] = this.dataFromGui[ToArduino.CONTROLS.getValue()];
+        this.dataToArduino[ToArduino.COMMANDS.getValue()] = this.dataFromGui[ToArduino.COMMANDS.getValue()];
+        this.dataToArduino[ToArduino.SENSITIVITY.getValue()] = this.dataFromGui[ToArduino.SENSITIVITY.getValue()];
+        
         this.fireStateChanged();
+    }
+    
+    /**
+     * Sets boolean flag to true or false depending on if there are new data
+     * available from GUI or not
+     * @param state true or false
+     */
+    public void setDataFromGuiAvailable(boolean state)
+    {
+        this.dataFromGuiAvailable = state;
+    }
+    
+    /**
+     * Returns boolean flag
+     * @return true if new data available, false if not
+     */
+    public boolean getDataFromGuiAvailable()
+    {
+        return this.dataFromGuiAvailable;
+    }
+    
+    /**
+     * Returns a specific byte from byte array from GUI
+     * @param b The specific byte
+     * @return The byte
+     */
+    public byte getByte(byte b)
+    {
+        return dataFromGui[b];
     }
 
     /**
      * Sets stop bit to high
      */
     public void stopAUV() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
-        this.fireStateChanged();
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.setBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
+        //this.fireStateChanged();
     }
 
     /**
      * Sets stop bit to low
      */
     public void releaseStopAUV() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
-        this.fireStateChanged();
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
+        //this.fireStateChanged();
+    }
+    
+    /**
+     * Gets value of stop bit
+     *
+     * @return stop bit
+     */
+    public byte getStopAUV()
+    {
+        return this.getBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.STOP.getValue());
     }
 
     /**
      * Sets forward bit to high
      */
     public void goFwd() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.setBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
         this.fireStateChanged();
     }
 
@@ -238,7 +287,7 @@ public class DataHandler {
      * Sets forward bit to low
      */
     public void releaseGoFwd() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.FORWARD.getValue());
         this.fireStateChanged();
     }
 
@@ -255,7 +304,7 @@ public class DataHandler {
      * Sets reverse bit to high
      */
     public void goRev() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.setBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
         this.fireStateChanged();
     }
 
@@ -263,7 +312,7 @@ public class DataHandler {
      * Sets reverse bit to low
      */
     public void releaseGoRev() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.REVERSE.getValue());
         this.fireStateChanged();
     }
 
@@ -280,7 +329,7 @@ public class DataHandler {
      * Sets left bit to high
      */
     public void goLeft() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.setBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
         this.fireStateChanged();
     }
 
@@ -288,7 +337,7 @@ public class DataHandler {
      * Sets left bit to low
      */
     public void releaseGoLeft() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.LEFT.getValue());
         this.fireStateChanged();
     }
 
@@ -305,7 +354,7 @@ public class DataHandler {
      * Sets right bit to high
      */
     public void goRight() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.setBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.setBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
         this.fireStateChanged();
     }
 
@@ -313,7 +362,7 @@ public class DataHandler {
      * Sets right bit to low
      */
     public void releaseGoRight() {
-        dataFromGui[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataFromGui[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
+        dataToArduino[ToArduino.CONTROLS.getValue()] = this.releaseBit(dataToArduino[ToArduino.CONTROLS.getValue()], ToArduino.controls.RIGHT.getValue());
         this.fireStateChanged();
     }
 
@@ -331,9 +380,17 @@ public class DataHandler {
      *
      * @param speed Speed value between 0-255
      */
-    public void setLeftMotorSpeed(byte speed) {
-        dataFromGui[ToArduino.LEFT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
+    public void setLeftMotorSpeed(float speed) {
+        dataToArduino[ToArduino.LEFT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
+    }
+    
+    public int getLeftMotorSpeed()
+    {
+        if(this.getSensitivity() == 0)
+            return 0;
+        else
+            return dataToArduino[ToArduino.LEFT_MOTOR_SPEED.getValue()] * (100 / this.getSensitivity());
     }
 
     /**
@@ -341,16 +398,24 @@ public class DataHandler {
      *
      * @param speed Speed value between 0-255
      */
-    public void setRightMotorSpeed(byte speed) {
-        dataFromGui[ToArduino.RIGHT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
+    public void setRightMotorSpeed(float speed) {
+        dataToArduino[ToArduino.RIGHT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
+    }
+    
+    public int getRightMotorSpeed()
+    {
+        if(this.getSensitivity() == 0)
+            return 0;
+        else
+            return dataToArduino[ToArduino.RIGHT_MOTOR_SPEED.getValue()] * (100 / this.getSensitivity());
     }
 
     /**
      * Sets left servo bit to high
      */
     public void setLeftServo() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.LEFT_SERVO.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.setBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.LEFT_SERVO.getValue());
         this.fireStateChanged();
     }
 
@@ -358,7 +423,7 @@ public class DataHandler {
      * Sets left servo bit to low
      */
     public void resetLeftServo() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.LEFT_SERVO.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.LEFT_SERVO.getValue());
         this.fireStateChanged();
     }
 
@@ -366,7 +431,7 @@ public class DataHandler {
      * Sets right servo bit to high
      */
     public void setRightServo() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.RIGHT_SERVO.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.setBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.RIGHT_SERVO.getValue());
         this.fireStateChanged();
     }
 
@@ -374,7 +439,7 @@ public class DataHandler {
      * Sets right servo bit to low
      */
     public void resetRightServo() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.RIGHT_SERVO.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.RIGHT_SERVO.getValue());
         this.fireStateChanged();
     }
 
@@ -383,7 +448,7 @@ public class DataHandler {
      * in manual mode
      */
     public void AUVmanualMode() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
         this.fireStateChanged();
     }
 
@@ -392,7 +457,7 @@ public class DataHandler {
      * now in auto mode
      */
     public void AUVautoMode() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.setBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.AUTO_MANUAL.getValue());
         this.fireStateChanged();
     }
 
@@ -409,7 +474,7 @@ public class DataHandler {
      * Sets the start bit to high
      */
     public void enableAUV() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.setBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.START.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.setBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.START.getValue());
         this.fireStateChanged();
     }
 
@@ -417,7 +482,7 @@ public class DataHandler {
      * Sets the start bit to low
      */
     public void disableAUV() {
-        dataFromGui[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataFromGui[ToArduino.COMMANDS.getValue()], ToArduino.commands.START.getValue());
+        dataToArduino[ToArduino.COMMANDS.getValue()] = this.releaseBit(dataToArduino[ToArduino.COMMANDS.getValue()], ToArduino.commands.START.getValue());
         this.fireStateChanged();
     }
 
