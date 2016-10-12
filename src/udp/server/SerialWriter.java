@@ -40,6 +40,7 @@ public class SerialWriter implements Runnable {
                     byte[] sendByte = datahandler.getDataFromController();
                     System.out.println(Arrays.toString(sendByte) + "SERIAL");
                     this.out.write(sendByte);
+                    this.out.flush();
                 }
                 
                 semaphore.release();

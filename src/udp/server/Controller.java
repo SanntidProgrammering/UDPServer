@@ -47,14 +47,15 @@ public class Controller implements Runnable {
      */
     private void runManual() {
         
-        Runnable run = new Runnable() {
+        /*Runnable run = new Runnable() {
             public void run()
             {
                 try {
                     while(true)
-                    {
+                    { Thread.sleep(1000);
+                        semaphore.acquire();
                         dh.incrementRequestCode();
-                        Thread.sleep(1000);
+                        semaphore.release();
                     }
                     
                 } catch (InterruptedException ex) {
@@ -64,7 +65,7 @@ public class Controller implements Runnable {
             }
         };
         
-        new Thread(run).start();
+        new Thread(run).start();*/
         
         while (true) {
             
@@ -77,12 +78,12 @@ public class Controller implements Runnable {
             
             if(dh.getDataFromGuiAvailable())
             {
-                if(dh.isDataFromArduinoAvailable())
+                /*if(dh.isDataFromArduinoAvailable())
                 {
                     System.out.println("Pixy x value: " + dh.getPixyXvalue());
                     System.out.println("Pixy y value: " + dh.getPixyYvalue());
                     System.out.println("Distance: " + dh.getDistanceSensor());
-                }
+                }*/
                 
                 switch(this.handleButtonStates())
                 {

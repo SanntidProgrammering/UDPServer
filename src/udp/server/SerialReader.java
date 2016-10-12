@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.IOUtils;
 
 public class SerialReader implements Runnable {
     // data from arduino
@@ -31,16 +30,18 @@ public class SerialReader implements Runnable {
     public void run() {
         while (dh.shouldThreadRun()) {
             try {
-                byte[] data = IOUtils.toByteArray(in);
-                
-                semaphore.acquire();
-                dh.handleDataFromArduino(data);
-                System.out.println("semaphore aqured and sending data to datahandler from arduino");
+                byte[] data = new byte[6];
+                in.read(data,0,data.length);
                 System.out.println(Arrays.toString(data));
+                
+                semaphore.acquire();   
+                
+                dh.handleDataFromArduino(data);
             } catch (InterruptedException ex) {
                 Logger.getLogger(SerialWriter.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(SerialReader.class.getName()).log(Level.SEVERE, null, ex);
+            
             } finally {
                 semaphore.release();
             }
