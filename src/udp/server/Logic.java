@@ -5,6 +5,9 @@
  */
 package udp.server;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author lars-harald
@@ -179,18 +182,35 @@ public class Logic {
         }
 
     }
-    
-    protected void handleServoStatesFromGui(){
-        if(dh.getLeftServo() == 1){
+
+    protected void handleServoStatesFromGui() {
+        if (dh.getLeftServo() == 1) {
             dh.setLeftServo();
         } else {
             dh.resetLeftServo();
         }
-        
-        if(dh.getRightServo() == 1){
+
+        if (dh.getRightServo() == 1) {
             dh.setRightServo();
         } else {
             dh.resetRightServo();
+        }
+    }
+
+    protected void decideToHitBallOrNot(int distance) {
+        if (distance >= dh.getDistanceSensor()) {
+            dh.setLeftServo();
+
+            // starter bakgrunnstråd og holder servo ute en stund selv om metoden returnerer
+            Runnable run = () -> {
+                try {
+                    Thread.sleep(2000);
+                    dh.resetLeftServo();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            };
+            new Thread(run).start();
         }
     }
 
