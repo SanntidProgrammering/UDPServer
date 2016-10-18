@@ -9,7 +9,7 @@ package udp.server;
  *
  * @author Eivind Fugledal
  */
-public enum ToArduino {
+public enum Protocol {
     
     CONTROLS(0),
     LEFT_MOTOR_SPEED(1),
@@ -20,7 +20,7 @@ public enum ToArduino {
     
     private int value;
        
-    private ToArduino(int value) {
+    private Protocol(int value) {
         this.value = value;
     }
         
