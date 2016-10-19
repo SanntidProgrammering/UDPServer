@@ -77,7 +77,6 @@ public class Controller implements Runnable {
                 System.out.println("Distance: " + dh.getDistanceSensor());
             }
             logic.prossesButtonCommandsFromGui();
-            logic.handleServoStatesFromGui();
 
             dh.setDataFromGuiAvailable(false);
         }
