@@ -14,6 +14,10 @@ import java.util.logging.Logger;
  */
 public class Logic {
 
+    /**
+     * states of movement of the vehicle algorithm: gofwd/rev + left/right if
+     * fwd and left active: 1 + 10 = 11 = GOFWDANDLEFT-state
+     */
     protected enum STATES {
         STOP(0),
         GOFWD(1),
@@ -42,12 +46,21 @@ public class Logic {
     private final int minSpeed = 0;
     private STATES state;
 
+    /**
+     * create new logic class
+     *
+     * @param dh datahandler
+     */
     public Logic(DataHandler dh) {
         this.dh = dh;
     }
 
+    /**
+     * run this method when vehicle is in manual mode, controlled from gui
+     */
     protected void prossesButtonCommandsFromGui() {
         this.handleButtonStates();
+        this.handleServoStatesFromGui();
         this.switchCaseButtonStates();
         this.switchCaseMotorSpeeds();
 
@@ -68,6 +81,7 @@ public class Logic {
 
     /**
      * Sets motor speed to run reverse
+     *
      * @param leftSpeed
      * @param rightSpeed
      */
@@ -106,6 +120,9 @@ public class Logic {
 
     }
 
+    /**
+     * select the correct state from gui buttons pushed
+     */
     protected void handleButtonStates() {
         // setter først buttonstate til null
         int buttonState = 0;
@@ -131,6 +148,9 @@ public class Logic {
         this.setStateByValue(buttonState);
     }
 
+    /**
+     * selects the correct movement of the vehicle from state
+     */
     protected void switchCaseButtonStates() {
         dh.resetToArduinoByte(0);
         switch (this.getState()) {
@@ -171,6 +191,9 @@ public class Logic {
 
     }
 
+    /**
+     * sets the correct motorspeeds from state (manual mode)
+     */
     protected void switchCaseMotorSpeeds() {
         switch (this.getState()) {
             case STOP:
@@ -218,6 +241,9 @@ public class Logic {
         }
     }
 
+    /**
+     * sets the servo motors (manual mode)
+     */
     protected void handleServoStatesFromGui() {
         if (dh.getLeftServo() == 1) {
             dh.setLeftServo();
@@ -232,6 +258,11 @@ public class Logic {
         }
     }
 
+    /**
+     * decide to hit the ball or not, using the left servo
+     *
+     * @param distance the distance that triggers the servo
+     */
     protected void decideToHitBallOrNot(int distance) {
         if (distance >= dh.getDistanceSensor()) {
 
@@ -249,26 +280,57 @@ public class Logic {
         }
     }
 
+    /**
+     * set right motorspeed
+     *
+     * @param rightSpeed
+     */
     public void setRightSpeed(float rightSpeed) {
         dh.setRightMotorSpeed(rightSpeed);
     }
 
+    /**
+     * set left motorspeed
+     *
+     * @param leftSpeed
+     */
     public void setLeftSpeed(float leftSpeed) {
         dh.setLeftMotorSpeed(leftSpeed);
     }
 
-   private STATES getState() {
+    /**
+     * get the state the vehicle is currently in
+     *
+     * @return
+     */
+    private STATES getState() {
         return state;
     }
 
+    /**
+     * set the state of movement to the vehicle
+     *
+     * @param state the new state of the vehicle
+     */
     private void setState(STATES state) {
         this.state = state;
     }
 
+    /**
+     * set state by value of the wanted state
+     *
+     * @param value integer value of the state
+     */
     private void setStateByValue(int value) {
         this.state = this.findState(value);
     }
 
+    /**
+     * find a state by state value
+     *
+     * @param value the integer representation of the state
+     * @return
+     */
     private STATES findState(int value) {
         STATES[] stateArray = STATES.values();
         for (STATES s : stateArray) {
