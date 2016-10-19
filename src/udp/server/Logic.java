@@ -35,13 +35,11 @@ public class Logic {
         protected int getValue() {
             return this.value;
         }
-
     }
 
     private final DataHandler dh;
     private final int maxSpeed = 255;
     private final int minSpeed = 0;
-    private int buttonState;
     private STATES state;
 
     public Logic(DataHandler dh) {
@@ -110,7 +108,7 @@ public class Logic {
 
     protected void handleButtonStates() {
         // setter først buttonstate til null
-        buttonState = 0;
+        int buttonState = 0;
         // sjekker at controlbyte er ulik null
         if (0 != dh.getFromGuiByte((byte) 0)) {
             // sjekker at ingen kommandoer er ulovlige (frem/bak samtidig)
@@ -259,11 +257,7 @@ public class Logic {
         dh.setLeftMotorSpeed(leftSpeed);
     }
 
-    public int getButtonState() {
-        return buttonState;
-    }
-
-    private STATES getState() {
+   private STATES getState() {
         return state;
     }
 
