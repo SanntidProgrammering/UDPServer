@@ -28,8 +28,7 @@ public class UDPServer implements Runnable {
     }
     
     /**
-     * Receives data from client, then sends it to the data handler
-     * @throws Exception 
+     * Receives data from client, then sends it to the datahandler
      */
     @Override
     public void run()
@@ -38,7 +37,6 @@ public class UDPServer implements Runnable {
             serverSocket = new DatagramSocket(serverPort);
             
             byte[] receiveData = new byte[6];
-            byte[] sendData = new byte[6];
             
             while(true)
             {
