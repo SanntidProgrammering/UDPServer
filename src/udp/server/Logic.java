@@ -14,12 +14,35 @@ import java.util.logging.Logger;
  */
 public class Logic {
 
+    protected enum STATES {
+        STOP(0),
+        GOFWD(1),
+        GOREV(-1),
+        GOLEFT(10),
+        GORIGHT(20),
+        GOFWDANDLEFT(11),
+        GOFWDANDRIGHT(21),
+        GOREVANDLEFT(9),
+        GOREVANDRIGHT(19),
+        DEFAULT(-99);
+
+        private int value;
+
+        private STATES(int value) {
+            this.value = value;
+        }
+
+        protected int getValue() {
+            return this.value;
+        }
+
+    }
+
     private final DataHandler dh;
-    private int rightSpeed = 0;
-    private int leftSpeed = 0;
-    private int maxSpeed = 255;
-    private int minSpeed = 0;
+    private final int maxSpeed = 255;
+    private final int minSpeed = 0;
     private int buttonState;
+    private STATES state;
 
     public Logic(DataHandler dh) {
         this.dh = dh;
@@ -28,159 +51,173 @@ public class Logic {
     protected void prossesButtonCommandsFromGui() {
         this.handleButtonStates();
         this.switchCaseButtonStates();
-        dh.setLeftMotorSpeed(leftSpeed);
-        dh.setRightMotorSpeed(rightSpeed);
+        this.switchCaseMotorSpeeds();
+
     }
 
     /**
      * Sets motor speed to run forward
+     *
+     * @param leftSpeed
+     * @param rightSpeed
      */
-    protected void runFWD() {
-        rightSpeed = maxSpeed;
-        leftSpeed = maxSpeed;
-
-        dh.goFwd();
-        dh.releaseStopAUV();
+    protected void runFWD(float leftSpeed, float rightSpeed) {
+        this.setState(STATES.GOFWD);
+        this.switchCaseButtonStates();
+        this.setLeftSpeed(leftSpeed);
+        this.setRightSpeed(rightSpeed);
     }
 
     /**
      * Sets motor speed to run reverse
+     * @param leftSpeed
+     * @param rightSpeed
      */
-    protected void runRev() {
-        rightSpeed = maxSpeed;
-        leftSpeed = maxSpeed;
-
-        dh.goRev();
-        dh.releaseStopAUV();
+    protected void runRev(float leftSpeed, float rightSpeed) {
+        this.setState(STATES.GOREV);
+        this.switchCaseButtonStates();
+        this.setLeftSpeed(leftSpeed);
+        this.setRightSpeed(rightSpeed);
     }
 
     /**
      * Sets motor speed to run left
-     *
-     * If running forward or reverse and left at the same time, left motor
-     * should run with half the speed compared to the right If only running
-     * left, right motor run at full speed
      */
     protected void runLeft() {
-        if ((1 == dh.getFwd()) || (1 == dh.getRev())) {
-            rightSpeed = maxSpeed;
-            leftSpeed = rightSpeed / 2;
-
-            dh.goFwd();
-        } else {
-            rightSpeed = maxSpeed;
-            leftSpeed = maxSpeed;
-
-            dh.goLeft();
-        }
-        dh.releaseStopAUV();
+        this.setState(STATES.GOLEFT);
+        this.switchCaseButtonStates();
+        this.switchCaseMotorSpeeds();
     }
 
     /**
      * Sets motor speed to run right
-     *
-     * If running forward or reverse and right at the same time, left motor
-     * should run with half the speed compared to the left If only running
-     * right, left motor run at full speed
      */
     protected void runRight() {
-        if ((1 == dh.getFwd()) || (1 == dh.getRev())) {
-            leftSpeed = maxSpeed;
-            rightSpeed = leftSpeed / 2;
-
-            dh.goFwd();
-        } else {
-            rightSpeed = maxSpeed;
-            leftSpeed = maxSpeed;
-
-            dh.goRight();
-        }
-        dh.releaseStopAUV();
+        this.setState(STATES.GORIGHT);
+        this.switchCaseButtonStates();
+        this.switchCaseMotorSpeeds();
     }
 
     /**
      * Sets motor speed zero/stop
      */
     protected void stop() {
-        rightSpeed = minSpeed;
-        leftSpeed = minSpeed;
+        this.setState(STATES.STOP);
+        this.switchCaseButtonStates();
+        this.switchCaseMotorSpeeds();
 
-        dh.stopAUV();
     }
 
     protected void handleButtonStates() {
+        // setter først buttonstate til null
+        buttonState = 0;
+        // sjekker at controlbyte er ulik null
         if (0 != dh.getFromGuiByte((byte) 0)) {
+            // sjekker at ingen kommandoer er ulovlige (frem/bak samtidig)
             if (!(((1 == dh.getFwd()) && (1 == dh.getRev())) || ((1 == dh.getLeft()) && (1 == dh.getRight())))) {
+                // gå frem
                 if (1 == dh.getFwd()) {
-                    buttonState = 1;
+
+                    buttonState = STATES.GOFWD.getValue();
+                    // gå bakover    
                 } else if (1 == dh.getRev()) {
-                    buttonState = -1;
-                } else {
-                    buttonState = 0;
+                    buttonState = STATES.GOREV.getValue();
                 }
                 if (1 == dh.getLeft()) {
-                    buttonState += 10;
+                    buttonState += STATES.GOLEFT.getValue();
                 } else if (1 == dh.getRight()) {
-                    buttonState += 20;
+                    buttonState += STATES.GORIGHT.getValue();
                 }
-            } else {
-                buttonState = 0;
             }
-        } else {
-            buttonState = 0;
         }
+        this.setStateByValue(buttonState);
     }
 
     protected void switchCaseButtonStates() {
         dh.resetToArduinoByte(0);
-        switch (buttonState) {
-            case 0:
-                leftSpeed = minSpeed;
-                rightSpeed = minSpeed;
+        switch (this.getState()) {
+            case STOP:
                 dh.stopAUV();
                 break;
-            case 1:
-                leftSpeed = maxSpeed;
-                rightSpeed = maxSpeed;
+            case GOFWD:
                 dh.goFwd();
                 break;
-            case -1:
-                leftSpeed = maxSpeed;
-                rightSpeed = maxSpeed;
+            case GOREV:
                 dh.goRev();
                 break;
-            case 10:
-                leftSpeed = maxSpeed;
-                rightSpeed = maxSpeed;
+            case GOLEFT:
                 dh.goLeft();
                 break;
-            case 20:
-                leftSpeed = maxSpeed;
-                rightSpeed = maxSpeed;
+            case GORIGHT:
                 dh.goRight();
                 break;
-            case 21:
-                leftSpeed = maxSpeed / 4;
-                rightSpeed = maxSpeed;
+            case GOFWDANDLEFT:
                 dh.goFwd();
                 break;
-            case 11:
-                leftSpeed = maxSpeed;
-                rightSpeed = maxSpeed / 4;
+            case GOFWDANDRIGHT:
                 dh.goFwd();
                 break;
-            case 9:
-                leftSpeed = maxSpeed;
-                rightSpeed = maxSpeed / 4;
+            case GOREVANDRIGHT:
                 dh.goRev();
                 break;
-            case 19:
-                leftSpeed = maxSpeed / 4;
-                rightSpeed = maxSpeed;
+            case GOREVANDLEFT:
                 dh.goRev();
+                break;
+            // unknown command
+            case DEFAULT:
+                break;
+            // just to be safe
+            default:
                 break;
         }
 
+    }
+
+    protected void switchCaseMotorSpeeds() {
+        switch (this.getState()) {
+            case STOP:
+                dh.setLeftMotorSpeed(minSpeed);
+                dh.setRightMotorSpeed(minSpeed);
+                break;
+            case GOFWD:
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed);
+                break;
+            case GOREV:
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed);
+                break;
+            case GOLEFT:
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed);
+                break;
+            case GORIGHT:
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed);
+                break;
+            case GOFWDANDLEFT:
+                dh.setLeftMotorSpeed(maxSpeed / 4);
+                dh.setRightMotorSpeed(maxSpeed);
+                break;
+            case GOFWDANDRIGHT:
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed / 4);
+                break;
+            case GOREVANDRIGHT:
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed / 4);
+                break;
+            case GOREVANDLEFT:
+                dh.setLeftMotorSpeed(maxSpeed / 4);
+                dh.setRightMotorSpeed(maxSpeed);
+                break;
+            // unknown command
+            case DEFAULT:
+                break;
+            // just to be safe
+            default:
+                break;
+        }
     }
 
     protected void handleServoStatesFromGui() {
@@ -199,7 +236,7 @@ public class Logic {
 
     protected void decideToHitBallOrNot(int distance) {
         if (distance >= dh.getDistanceSensor()) {
-           
+
             // starter bakgrunnstråd og holder servo ute en stund selv om metoden returnerer
             Runnable run = () -> {
                 try {
@@ -214,16 +251,38 @@ public class Logic {
         }
     }
 
-    public int getRightSpeed() {
-        return rightSpeed;
+    public void setRightSpeed(float rightSpeed) {
+        dh.setRightMotorSpeed(rightSpeed);
     }
 
-    public int getLeftSpeed() {
-        return leftSpeed;
+    public void setLeftSpeed(float leftSpeed) {
+        dh.setLeftMotorSpeed(leftSpeed);
     }
 
     public int getButtonState() {
         return buttonState;
+    }
+
+    private STATES getState() {
+        return state;
+    }
+
+    private void setState(STATES state) {
+        this.state = state;
+    }
+
+    private void setStateByValue(int value) {
+        this.state = this.findState(value);
+    }
+
+    private STATES findState(int value) {
+        STATES[] stateArray = STATES.values();
+        for (STATES s : stateArray) {
+            if (s.getValue() == value) {
+                return s;
+            }
+        }
+        return STATES.DEFAULT;
     }
 
 }
