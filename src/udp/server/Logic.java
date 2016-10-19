@@ -199,11 +199,11 @@ public class Logic {
 
     protected void decideToHitBallOrNot(int distance) {
         if (distance >= dh.getDistanceSensor()) {
-            dh.setLeftServo();
-
+           
             // starter bakgrunnstråd og holder servo ute en stund selv om metoden returnerer
             Runnable run = () -> {
                 try {
+                    dh.setLeftServo();
                     Thread.sleep(2000);
                     dh.resetLeftServo();
                 } catch (InterruptedException ex) {
