@@ -8,6 +8,7 @@ package udp.server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.Semaphore;
+import org.opencv.core.Core;
 
 /**
  *
@@ -20,12 +21,14 @@ public class Main {
     private static Thread controller;
     private static Thread server;
     private static Semaphore semaphore;
+    private static Thread tracker; // Testing
     static SendEventState enumStateEvent;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args){
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         semaphore = new Semaphore(1, true);
         
         dh = new DataHandler();
@@ -34,14 +37,19 @@ public class Main {
         gd = new GUIData(dh, semaphore);
         controller = new Thread(new Controller(dh, semaphore));
         server = new Thread(new UDPServer(gd));
+
+        tracker = new Thread(new ObjectTracker(dh,semaphore));
+        
+        
         
         gd.start();
         controller.start();
         server.start();
+        tracker.start();
         
         SerialComArduino sca = new SerialComArduino(dh);
         try {
-            sca.connect("COM4", semaphore);
+            sca.connect("COM6", semaphore);
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

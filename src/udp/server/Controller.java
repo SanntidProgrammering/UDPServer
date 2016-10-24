@@ -46,7 +46,7 @@ public class Controller implements Runnable {
      * Logic while running in manual mode
      */
     private void runManual() {
-        
+        /*
         Runnable run = new Runnable() {
             public void run()
             {
@@ -65,6 +65,7 @@ public class Controller implements Runnable {
         };
         
         new Thread(run).start();
+        */
         
         while (true) {
             
