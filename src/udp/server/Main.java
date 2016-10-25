@@ -23,6 +23,8 @@ public class Main {
     private static Semaphore semaphore;
     private static Thread tracker; // Testing
     static SendEventState enumStateEvent;
+    protected static String ipAdress;
+    private static CameraCapture camera;
     
     /**
      * @param args the command line arguments
@@ -46,6 +48,8 @@ public class Main {
         controller.start();
         server.start();
         tracker.start();
+        
+        camera = new CameraCapture();
         
         SerialComArduino sca = new SerialComArduino(dh);
         try {

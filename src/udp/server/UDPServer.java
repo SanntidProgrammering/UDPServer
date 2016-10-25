@@ -29,8 +29,7 @@ public class UDPServer implements Runnable {
     }
     
     /**
-     * Receives data from client, then sends it to the data handler
-     * @throws Exception 
+     * Receives data from client, then sends it to the datahandler
      */
     @Override
     public void run()
@@ -38,13 +37,15 @@ public class UDPServer implements Runnable {
         try {
             serverSocket = new DatagramSocket(serverPort);
             byte[] receiveData = new byte[6];
-            byte[] sendData = new byte[6];
             
             while(true)
             {          
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.receive(receivePacket);
-                System.out.println("System.out.println(\"Exception-.-.-.-.-.-.-.-.-.-.-.-\");");
+                
+                Main.ipAdress = receivePacket.getAddress().getHostAddress();
+                System.out.println("IP " + Main.ipAdress);
+                
                 System.out.println(Arrays.toString(receiveData) + " UDP");
                 guiData.receiveFromUDP(receiveData);
             }
