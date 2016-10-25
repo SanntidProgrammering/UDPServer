@@ -19,6 +19,7 @@ public class UDPServer implements Runnable {
     
     private DatagramSocket serverSocket;
     private final int serverPort = 9876;
+    private int PACKET_LENGTH = 1024;
     
     private final GUIData guiData;
     
@@ -36,20 +37,23 @@ public class UDPServer implements Runnable {
     {
         try {
             serverSocket = new DatagramSocket(serverPort);
-            
             byte[] receiveData = new byte[6];
             byte[] sendData = new byte[6];
             
             while(true)
-            {
+            {          
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.receive(receivePacket);
+                System.out.println("System.out.println(\"Exception-.-.-.-.-.-.-.-.-.-.-.-\");");
                 System.out.println(Arrays.toString(receiveData) + " UDP");
                 guiData.receiveFromUDP(receiveData);
             }
         } catch (SocketException ex) {
+            System.out.println("Exception-.-.-.-.-.-.-.-.-.-.-.-");
             Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
+            
         } catch (IOException ex) {
+            System.out.println("Exception-.-.-.-.-.-.-.-.-.-.-.-");
             Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
