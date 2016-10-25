@@ -42,6 +42,10 @@ public class UDPServer implements Runnable {
             {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.receive(receivePacket);
+                
+                Main.ipAdress = receivePacket.getAddress().getHostAddress();
+                System.out.println("IP " + Main.ipAdress);
+                
                 System.out.println(Arrays.toString(receiveData) + " UDP");
                 guiData.receiveFromUDP(receiveData);
             }

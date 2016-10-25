@@ -21,6 +21,8 @@ public class Main {
     private static Thread server;
     private static Semaphore semaphore;
     static SendEventState enumStateEvent;
+    protected static String ipAdress;
+    private static CameraCapture camera;
     
     /**
      * @param args the command line arguments
@@ -38,6 +40,8 @@ public class Main {
         gd.start();
         controller.start();
         server.start();
+        
+        camera = new CameraCapture();
         
         SerialComArduino sca = new SerialComArduino(dh);
         try {
