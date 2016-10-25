@@ -104,11 +104,12 @@ public class ObjectTracker implements Runnable {
 		
                 //capture.read(webcam_image);  
                 webcam_image = this.camCap.getFrame();
-
-		array255 = new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
+                array255 = new Mat(480,640,CvType.CV_8UC1);
+		//array255 = new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
 		array255.setTo(new Scalar(255));  
 
-                distance=new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
+                distance=new Mat(480,640,CvType.CV_8UC1);
+                //distance=new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
                 lhsv = new ArrayList<>(3);      
 		circles = new Mat();
     }
@@ -116,7 +117,9 @@ public class ObjectTracker implements Runnable {
     private void trackColors() {
                
                while(true)  {
-		    capture.read(webcam_image);  
+		    //capture.read(webcam_image);  
+                    //System.out.println(this.camCap.getFrame().size());
+                    webcam_image = this.camCap.getFrame();
 	            if( !webcam_image.empty() ) { 
                                     
                                     
@@ -176,14 +179,10 @@ public class ObjectTracker implements Runnable {
                         }         
                         }
                                                 
-                    else{
+                    /*else {
 				  
-			System.out.println(" --(!) No captured frame -- Break!");  
-			break;  
-			}                                         
-                                        
-               
-                                    
+			System.out.println(" --(!) No captured frame -- Break!"); 
+	            } */            
                }
     }
 
