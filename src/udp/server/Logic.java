@@ -46,6 +46,7 @@ public class Logic {
     private final int minSpeed = 0;
     private STATES state;
 
+
     /**
      * create new logic class
      *
@@ -53,6 +54,7 @@ public class Logic {
      */
     public Logic(DataHandler dh) {
         this.dh = dh;
+
     }
 
     /**
@@ -65,14 +67,7 @@ public class Logic {
         this.switchCaseMotorSpeeds();
 
     }
-    
-    protected void prossesAutoCommands(int xValue, int dist) {
-        this.handleAutoStates(xValue, dist);
-        this.handleServoStatesFromGui();
-        this.switchCaseButtonStates();
-        this.switchCaseMotorSpeeds();
 
-    }
 
     /**
      * Sets motor speed to run forward
@@ -155,49 +150,13 @@ public class Logic {
         }
         this.setStateByValue(buttonState);
     }
-    
-    protected void handleAutoStates(int xValue, int dist){
+
+    protected void handleAutoStates(double setp, double xAngle, int dist) {
         // setter først buttonstate til null
         int buttonState = 0;
-        int objectxValue = 0;
-        int distValue = 0;
-        
-        objectxValue = xValue;
-        distValue = dist;
-        
-        if (objectxValue == 0)
-        {
-            buttonState = STATES.GOFWD.getValue();  
-        }
-        
-        else
-        {
-        
-        if (((objectxValue<-5)&&(objectxValue>5)) && (dist>10))
-        {
-            buttonState = STATES.GOFWD.getValue(); 
-        }
-        
-        else if ((objectxValue<-6) && (dist<10))
-        {
-            buttonState += STATES.GOLEFT.getValue();
-        }
-        
-         else if ((objectxValue>6) && (dist>10))
-        {
-            buttonState += STATES.GORIGHT.getValue();
-        }
-        
-         else if ((objectxValue<150) && (dist>10))
-        {
-            buttonState = STATES.GOFWD.getValue(); 
-        }
-         
+    
+
     }
-        this.setStateByValue(buttonState);
-    }
-        
-       
 
     /**
      * selects the correct movement of the vehicle from state
@@ -391,5 +350,7 @@ public class Logic {
         }
         return STATES.DEFAULT;
     }
+
+
 
 }

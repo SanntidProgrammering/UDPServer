@@ -5,6 +5,7 @@
  */
 package udp.server;
 
+import java.util.Timer;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,10 @@ public class Controller implements Runnable {
     private final DataHandler dh;
     private final Semaphore semaphore;
     private final Logic logic;
+    private Timer timer;
+    private byte AUVstate;
+    private byte lastAUVstate;
+    private long PIDperiodeTime = 100;
 
     Thread t;
 
@@ -25,10 +30,11 @@ public class Controller implements Runnable {
         this.dh = dh;
         this.semaphore = semaphore;
         this.logic = new Logic(this.dh);
+        this.timer = new Timer();
     }
-    
-    public void start(){
-        t = new Thread(this,"controller thread");
+
+    public void start() {
+        t = new Thread(this, "controller thread");
         t.start();
     }
 
@@ -36,52 +42,49 @@ public class Controller implements Runnable {
     public void run() {
 
         this.startRequestFeedbacks();
+        acquire();
+        boolean run = dh.shouldThreadRun();
+        release();
 
-        while (dh.shouldThreadRun()) {
-            
-            try {
-                semaphore.acquire();
+        while (run) {
+            acquire();
+            run = dh.shouldThreadRun();
+            AUVstate = dh.getAUVautoMode();
+            release();
+            if (AUVstate == 1 && lastAUVstate == 0) {
+                // start ny pid regulering
+                timer.scheduleAtFixedRate(new PidScheduler(dh, semaphore), 0, PIDperiodeTime);
 
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (dh.getAUVautoMode() == 1) {
-
-                this.runAuto();
-
-            } else if (dh.getAUVautoMode() == 0) {
-
+            } else if (AUVstate == 0) {
+                if (lastAUVstate == 1) {
+                    // skifter til manuell modus, stopp timer task på pid
+                    this.canselPID();
+                }
                 this.runManual();
-
             }
-            semaphore.release();
+            lastAUVstate = AUVstate;
         }
+        this.canselPID();
     }
 
     /**
-     * Logic while running in auto mode
+     * stop scheduler PID
      */
-    private void runAuto() {
-
-    if (dh.getDataFromGuiAvailable()) {
-            if (dh.isDataFromArduinoAvailable()) {
-                System.out.println("Camera x value: " + dh.getPixyXvalue());
-                System.out.println("Camera y value: " + dh.getPixyYvalue());
-                System.out.println("Distance: " + dh.getDistanceSensor());
-            }
-            logic.prossesAutoCommands(dh.getPixyXvalue(), dh.getDistanceSensor());
-
-            dh.setDataFromGuiAvailable(false);
-        }
-
+    private void canselPID() {
+        timer.cancel();
+        timer.purge();
     }
 
     /**
      * Logic while running in manual mode
      */
     private void runManual() {
-
-        if (dh.getDataFromGuiAvailable()) {
+        acquire();
+        boolean dataFromGui = dh.getDataFromGuiAvailable();
+        release();
+        if (dataFromGui) {
+            acquire();
+            
             if (dh.isDataFromArduinoAvailable()) {
                 System.out.println("Camera x value: " + dh.getPixyXvalue());
                 System.out.println("Camera y value: " + dh.getPixyYvalue());
@@ -90,12 +93,13 @@ public class Controller implements Runnable {
             logic.prossesButtonCommandsFromGui();
 
             dh.setDataFromGuiAvailable(false);
+            release();
         }
-
     }
 
     private void startRequestFeedbacks() {
-        Runnable run = () -> {
+        Runnable run;
+        run = () -> {
             try {
                 while (dh.shouldThreadRun()) {
                     dh.incrementRequestCode();
@@ -106,5 +110,18 @@ public class Controller implements Runnable {
             }
         };
         new Thread(run).start();
+    }
+
+    private void acquire() {
+        try {
+            semaphore.acquire();
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void release() {
+        semaphore.release();
     }
 }
