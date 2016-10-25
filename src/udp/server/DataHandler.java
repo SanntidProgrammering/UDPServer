@@ -28,8 +28,8 @@ public class DataHandler {
     private boolean dataFromArduinoAvaliable = false;
     private boolean dataFromGuiAvailable = false;
     private boolean threadStatus;
-    private int pixyXvalue;
-    private int pixyYvalue;
+    private float pixyXvalue;
+    private float pixyYvalue;
     private int distanceSensor;
     private byte requestCodeFromArduino;
     private boolean enableAUV;
@@ -103,8 +103,8 @@ public class DataHandler {
             this.dataFromArduino = data;
             this.setDistanceSensor(data[4]);
             this.setRequestCodeFromArduino(data[5]);
-            this.setPixyXvalue(new BigInteger(Arrays.copyOfRange(data, 0, 2)).intValue());
-            this.setPixyYvalue(new BigInteger(Arrays.copyOfRange(data, 2, 4)).intValue());
+            //this.setPixyXvalue(new BigInteger(Arrays.copyOfRange(data, 0, 2)).intValue());
+            //this.setPixyYvalue(new BigInteger(Arrays.copyOfRange(data, 2, 4)).intValue());
             this.dataFromArduinoAvaliable = true;
         }
     }
@@ -122,7 +122,7 @@ public class DataHandler {
      *
      * @return x-value
      */
-    public int getPixyXvalue() {
+    public float getPixyXvalue() {
         return pixyXvalue;
     }
 
@@ -131,7 +131,7 @@ public class DataHandler {
      *
      * @param pixyXvalue x-value
      */
-    public void setPixyXvalue(int pixyXvalue) {
+    public void setPixyXvalue(float pixyXvalue) {
         this.pixyXvalue = pixyXvalue;
     }
 
@@ -140,7 +140,7 @@ public class DataHandler {
      *
      * @return y-value
      */
-    public int getPixyYvalue() {
+    public float getPixyYvalue() {
         return pixyYvalue;
     }
 
@@ -149,7 +149,7 @@ public class DataHandler {
      *
      * @param pixyYvalue y-value
      */
-    public void setPixyYvalue(int pixyYvalue) {
+    public void setPixyYvalue(float pixyYvalue) {
         this.pixyYvalue = pixyYvalue;
     }
 

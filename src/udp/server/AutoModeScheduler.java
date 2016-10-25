@@ -14,11 +14,12 @@ import java.util.logging.Logger;
  *
  * @author lars-harald
  */
-public class PidScheduler extends TimerTask {
+public class AutoModeScheduler extends TimerTask {
 
     private final MiniPID pid;
     private final DataHandler dh;
     private final Semaphore semaphore;
+    private final Logic logic;
 
     private double xAngle;
     private double lastXangle;
@@ -32,10 +33,11 @@ public class PidScheduler extends TimerTask {
     private double pidOutputLimit = 10.0; // feks
     private double speedFactor = 70.0; // % fart av maksimal hastighet
 
-    public PidScheduler(DataHandler dh, Semaphore semaphore) {
+    public AutoModeScheduler(DataHandler dh, Semaphore semaphore, Logic logic) {
         this.pid = new MiniPID(P, I, D);
         this.semaphore = semaphore;
         this.dh = dh;
+        this.logic = logic;
 
         this.pid.setOutputLimits(pidOutputLimit);
         this.pid.setMaxIOutput(2);
@@ -48,26 +50,18 @@ public class PidScheduler extends TimerTask {
     public void run() {
         acquire();
         xAngle = dh.getPixyXvalue();
-        //TODO::
-        if (xAngle == lastXangle) {
-            release();
-            return;
-        }
         release();
         output = limit(pid.getOutput(xAngle, setpoint),-pidOutputLimit,pidOutputLimit);
-        if (output == lastOutput) {
-            return;
-        } else {
+        if (output != lastOutput) {
             //                           max hastighet rett frem            %pådrag fra pid regulator
             float leftSpeed = (float) ((255.0 * (speedFactor / 100.0)) * Math.abs(1 - (output / pidOutputLimit)));
             float rightSpeed = (float) ((255.0 * (speedFactor / 100.0)) * Math.abs(1 + (output / pidOutputLimit)));
             
             acquire();
-            dh.setLeftMotorSpeed(leftSpeed);
-            dh.setRightMotorSpeed(rightSpeed);
+            logic.runFWD(leftSpeed, rightSpeed);
+            logic.decideToHitBallOrNot(dh.getDistanceSensor());
             release();
         }
-
         lastOutput = output;
     }
     

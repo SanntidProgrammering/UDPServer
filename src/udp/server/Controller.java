@@ -19,10 +19,10 @@ public class Controller implements Runnable {
     private final DataHandler dh;
     private final Semaphore semaphore;
     private final Logic logic;
-    private Timer timer;
+    private final Timer timer;
     private byte AUVstate;
     private byte lastAUVstate;
-    private long PIDperiodeTime = 100;
+    private final long PIDperiodeTime = 100;
 
     Thread t;
 
@@ -53,7 +53,7 @@ public class Controller implements Runnable {
             release();
             if (AUVstate == 1 && lastAUVstate == 0) {
                 // start ny pid regulering
-                timer.scheduleAtFixedRate(new PidScheduler(dh, semaphore), 0, PIDperiodeTime);
+                timer.scheduleAtFixedRate(new AutoModeScheduler(dh, semaphore, logic), 0, PIDperiodeTime);
 
             } else if (AUVstate == 0) {
                 if (lastAUVstate == 1) {
@@ -79,10 +79,7 @@ public class Controller implements Runnable {
      * Logic while running in manual mode
      */
     private void runManual() {
-        acquire();
-        boolean dataFromGui = dh.getDataFromGuiAvailable();
-        release();
-        if (dataFromGui) {
+        if (dh.getDataFromGuiAvailable()) {
             acquire();
             
             if (dh.isDataFromArduinoAvailable()) {
@@ -102,7 +99,9 @@ public class Controller implements Runnable {
         run = () -> {
             try {
                 while (dh.shouldThreadRun()) {
+                    acquire();
                     dh.incrementRequestCode();
+                    release();
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException ex) {
