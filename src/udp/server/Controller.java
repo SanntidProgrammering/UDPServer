@@ -63,6 +63,17 @@ public class Controller implements Runnable {
      */
     private void runAuto() {
 
+    if (dh.getDataFromGuiAvailable()) {
+            if (dh.isDataFromArduinoAvailable()) {
+                System.out.println("Camera x value: " + dh.getPixyXvalue());
+                System.out.println("Camera y value: " + dh.getPixyYvalue());
+                System.out.println("Distance: " + dh.getDistanceSensor());
+            }
+            logic.prossesAutoCommands(dh.getPixyXvalue(), dh.getDistanceSensor());
+
+            dh.setDataFromGuiAvailable(false);
+        }
+
     }
 
     /**
@@ -72,8 +83,8 @@ public class Controller implements Runnable {
 
         if (dh.getDataFromGuiAvailable()) {
             if (dh.isDataFromArduinoAvailable()) {
-                System.out.println("Pixy x value: " + dh.getPixyXvalue());
-                System.out.println("Pixy y value: " + dh.getPixyYvalue());
+                System.out.println("Camera x value: " + dh.getPixyXvalue());
+                System.out.println("Camera y value: " + dh.getPixyYvalue());
                 System.out.println("Distance: " + dh.getDistanceSensor());
             }
             logic.prossesButtonCommandsFromGui();
