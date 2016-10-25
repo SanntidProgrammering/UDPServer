@@ -24,7 +24,7 @@ public class Controller implements Runnable {
     private byte lastAUVstate;
     private final long PIDperiodeTime = 100;
 
-    Thread t;
+    private Thread t;
 
     public Controller(DataHandler dh, Semaphore semaphore) {
         this.dh = dh;
@@ -58,19 +58,19 @@ public class Controller implements Runnable {
             } else if (AUVstate == 0) {
                 if (lastAUVstate == 1) {
                     // skifter til manuell modus, stopp timer task på pid
-                    this.canselPID();
+                    this.cancelPID();
                 }
                 this.runManual();
             }
             lastAUVstate = AUVstate;
         }
-        this.canselPID();
+        this.cancelPID();
     }
 
     /**
      * stop scheduler PID
      */
-    private void canselPID() {
+    private void cancelPID() {
         timer.cancel();
         timer.purge();
     }

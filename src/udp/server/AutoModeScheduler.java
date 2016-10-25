@@ -22,7 +22,6 @@ public class AutoModeScheduler extends TimerTask {
     private final Logic logic;
 
     private double xAngle;
-    private double lastXangle;
     private double setpoint = 0.0;
     private double output;
     private double lastOutput;
