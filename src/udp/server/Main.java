@@ -39,8 +39,8 @@ public class Main {
         gd = new GUIData(dh, semaphore);
         controller = new Thread(new Controller(dh, semaphore));
         server = new Thread(new UDPServer(gd));
-
-        tracker = new Thread(new ObjectTracker(dh,semaphore));
+        camera = new CameraCapture();
+        tracker = new Thread(new ObjectTracker(dh,semaphore,camera));
         
         
         
@@ -49,7 +49,7 @@ public class Main {
         server.start();
         tracker.start();
         
-        camera = new CameraCapture();
+        
         
         SerialComArduino sca = new SerialComArduino(dh);
         try {

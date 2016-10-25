@@ -36,6 +36,7 @@ public class ObjectTracker implements Runnable {
     
     private DataHandler dh;
     private Semaphore semaphore;
+    private CameraCapture camCap;
     
     private VideoCapture capture;
 
@@ -66,9 +67,10 @@ public class ObjectTracker implements Runnable {
     
     List<MatOfPoint> contours;
     
-    public ObjectTracker(DataHandler dh, Semaphore semaphore){
+    public ObjectTracker(DataHandler dh, Semaphore semaphore, CameraCapture camCap){
         this.dh = dh;
         this.semaphore = semaphore;
+        this.camCap = camCap;
         
         //System.loadLibrary(Core.NATIVE_LIBRARY_NAME); 
         try{ 
@@ -94,13 +96,14 @@ public class ObjectTracker implements Runnable {
     
     private void createFrames() throws AWTException {
                 
-                capture = new VideoCapture(1); 
+                //capture = new VideoCapture(1); 
 
-                capture.set(3, 1280); //capture.set(3, 1366);
-		capture.set(4, 720); //capture.set(4, 768);
-		capture.set(15, -3);
+                //capture.set(3, 1280); //capture.set(3, 1366); // 500
+		//capture.set(4, 720); //capture.set(4, 768); // 400
+		//capture.set(15, -3);
 		
-                capture.read(webcam_image);  
+                //capture.read(webcam_image);  
+                webcam_image = this.camCap.getFrame();
 
 		array255 = new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
 		array255.setTo(new Scalar(255));  
