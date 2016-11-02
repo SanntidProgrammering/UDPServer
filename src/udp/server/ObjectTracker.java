@@ -171,8 +171,8 @@ public class ObjectTracker implements Runnable {
                           this.dh.setPixyXvalue( (int) eXa);
                           this.dh.setPixyYvalue( (int) eYa);
                           
-                          System.out.print("AngleErrorX: "+errorAngles.get(0));
-                          System.out.println("       AngleErrorY: "+ errorAngles.get(1));
+                          //System.out.print("AngleErrorX: "+errorAngles.get(0));
+                          //System.out.println("       AngleErrorY: "+ errorAngles.get(1));
                           
                           semaphore.release();
                         

@@ -36,7 +36,7 @@ public class CameraCapture extends Thread {
     public CameraCapture()
     {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        capture = new VideoCapture(1);
+        capture = new VideoCapture(-1);
         frame = new Mat();
         mob = new MatOfByte();
         cameraSender = new CameraSender();
@@ -55,22 +55,25 @@ public class CameraCapture extends Thread {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             buff = this.getBufferedImage();
             
-            try {
-                buff = this.scale(buff, buff.getType(), buff.getWidth(), buff.getHeight(), 0.25, 0.25);
+            if(buff != null)
+            {
+                try {
+                    buff = this.scale(buff, buff.getType(), buff.getWidth(), buff.getHeight(), 0.25, 0.25);
             
-                ImageIO.write(buff, "bmp", baos);
-                baos.flush();
-                byte[] imageInByte = baos.toByteArray();
-                baos.close();
+                    ImageIO.write(buff, "bmp", baos);
+                    baos.flush();
+                    byte[] imageInByte = baos.toByteArray();
+                    baos.close();
             
-                cameraSender.send(Main.ipAdress, imageInByte, 8765);
+                    cameraSender.send(Main.ipAdress, imageInByte, 8765);
                 
-                Thread.sleep(5);
+                    Thread.sleep(5);
             
-            } catch (IOException ex) {
-                Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
