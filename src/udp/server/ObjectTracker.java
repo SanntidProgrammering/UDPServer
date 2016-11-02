@@ -150,12 +150,12 @@ public class ObjectTracker implements Runnable {
                         Imgproc.GaussianBlur(thresholded, thresholded, new Size(9,9),0,0);  
 			Imgproc.HoughCircles(thresholded, circles, Imgproc.CV_HOUGH_GRADIENT, 2, thresholded.height()/8, 200, 100, 0, 0);   
 			Imgproc.findContours(thresholded, contours, thresholded2, Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
-			Imgproc.drawContours(webcam_image, contours, -1, new Scalar(255, 0, 0), 2);   
+			//------Imgproc.drawContours(webcam_image, contours, -1, new Scalar(255, 0, 0), 2);   
 
-                        Core.circle(webcam_image, new Point(210,210), 10, new Scalar(100,10,10),3);  
+                        //------Core.circle(webcam_image, new Point(210,210), 10, new Scalar(100,10,10),3);  
 			data=webcam_image.get(210, 210);  
-			Core.putText(webcam_image,String.format("("+String.valueOf(data[0])+","+String.valueOf(data[1])+","+String.valueOf(data[2])+")"),new Point(30, 30) , 3 //FONT_HERSHEY_SCRIPT_SIMPLEX  
-				,1.0,new Scalar(100,10,10,255),3); 
+			//------Core.putText(webcam_image,String.format("("+String.valueOf(data[0])+","+String.valueOf(data[1])+","+String.valueOf(data[2])+")"),new Point(30, 30) , 3 //FONT_HERSHEY_SCRIPT_SIMPLEX  
+			//------	,1.0,new Scalar(100,10,10,255),3); 
                         //ArrayList<Float> errorAngles = new ArrayList<>();
                         ArrayList<Float> errorAngles = getTargetError();
                         
@@ -168,8 +168,8 @@ public class ObjectTracker implements Runnable {
                           }
                           float eXa = (errorAngles.get(0));
                           float eYa = (errorAngles.get(1));
-                          this.dh.setPixyXvalue( (int) eXa);
-                          this.dh.setPixyYvalue( (int) eYa);
+                          this.dh.setPixyXvalue(eXa);
+                          this.dh.setPixyYvalue(eYa);
                           
                           //System.out.print("AngleErrorX: "+errorAngles.get(0));
                           //System.out.println("       AngleErrorY: "+ errorAngles.get(1));

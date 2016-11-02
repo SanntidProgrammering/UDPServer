@@ -26,9 +26,11 @@ public class AutoModeScheduler extends TimerTask {
     private double output;
     private double lastOutput;
 
-    private double P;
-    private double I;
-    private double D;
+    private double P = 0.5;
+    private double I = 0.1;
+    private double D = 0.0;
+    
+    
     private double pidOutputLimit = 10.0; // feks
     private double speedFactor = 70.0; // % fart av maksimal hastighet
 
