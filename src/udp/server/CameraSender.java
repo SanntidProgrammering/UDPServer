@@ -38,7 +38,7 @@ public class CameraSender {
     */
     public void send(String ipAddress, byte[] data, int port){
         this.init();
-        System.out.println(data.length);
+        //System.out.println(data.length);
         
          try {
             
@@ -48,7 +48,7 @@ public class CameraSender {
                                         port);
             clientSocket.send(packet);
              //System.out.println(Arrays.toString(data));
-            System.out.println("UDP send");
+            //System.out.println("UDP send");
         } catch (IOException ex) {
             Logger.getLogger(CameraSender.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

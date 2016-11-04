@@ -5,7 +5,6 @@
  */
 package udp.server;
 
-import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,8 +14,8 @@ import java.util.logging.Logger;
  * @author Eivind Fugledal
  */
 public class GUIData extends Thread {
-    private DataHandler dh;
-    private Semaphore semaphore;
+    private final DataHandler dh;
+    private final Semaphore semaphore;
     
     
     public GUIData(DataHandler dh, Semaphore semaphore)

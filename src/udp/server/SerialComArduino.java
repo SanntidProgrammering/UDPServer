@@ -22,7 +22,7 @@ public class SerialComArduino
         super();
         this.datahandler = datahandler;
     }
-    
+
     void connect (String portName, Semaphore semaphore) throws Exception
     {
         System.out.println("Connect");
@@ -39,8 +39,8 @@ public class SerialComArduino
             {
                 SerialPort serialPort = (SerialPort) commPort;
                 serialPort.setSerialPortParams(19200,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-                //serialPort.disableReceiveTimeout();
-                //serialPort.enableReceiveThreshold(6);
+                serialPort.disableReceiveTimeout();
+                serialPort.enableReceiveThreshold(1);
                 InputStream in = serialPort.getInputStream();
                 OutputStream out = serialPort.getOutputStream();
                 

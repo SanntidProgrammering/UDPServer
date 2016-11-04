@@ -28,29 +28,30 @@ public class SerialWriter implements Runnable {
     public void run() {
         try {
             while (datahandler.shouldThreadRun()) {
-                
-                try {
-                    semaphore.acquire();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(SerialWriter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                if(datahandler.checkSendDataAvailable())
-                {
+
+                if (datahandler.checkSendDataAvailable()) {
+                    acquire();
                     byte[] sendByte = datahandler.getDataFromController();
+                    release();
                     System.out.println(Arrays.toString(sendByte) + "SERIAL");
                     this.out.write(sendByte);
                     this.out.flush();
                 }
-                
-                semaphore.release();
-                
-                //Thread.yield();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    private void acquire() {
+        try {
+            semaphore.acquire();
 
-    
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void release() {
+        semaphore.release();
+    }
 }

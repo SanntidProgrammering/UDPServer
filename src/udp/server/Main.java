@@ -42,18 +42,15 @@ public class Main {
         camera = new CameraCapture();
         tracker = new Thread(new ObjectTracker(dh,semaphore,camera));
         
-        
-        
         gd.start();
         controller.start();
         server.start();
+        camera.start();
         tracker.start();
-        
-        
         
         SerialComArduino sca = new SerialComArduino(dh);
         try {
-            sca.connect("COM6", semaphore);
+            sca.connect("/dev/ttyUSB0", semaphore);
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

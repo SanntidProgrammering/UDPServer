@@ -104,11 +104,12 @@ public class ObjectTracker implements Runnable {
 		
                 //capture.read(webcam_image);  
                 webcam_image = this.camCap.getFrame();
-
-		array255 = new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
+                array255 = new Mat(480,640,CvType.CV_8UC1);
+		//array255 = new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
 		array255.setTo(new Scalar(255));  
 
-                distance=new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
+                distance=new Mat(480,640,CvType.CV_8UC1);
+                //distance=new Mat(webcam_image.height(),webcam_image.width(),CvType.CV_8UC1);  
                 lhsv = new ArrayList<>(3);      
 		circles = new Mat();
     }
@@ -116,7 +117,9 @@ public class ObjectTracker implements Runnable {
     private void trackColors() {
                
                while(true)  {
-		    capture.read(webcam_image);  
+		    //capture.read(webcam_image);  
+                    //System.out.println(this.camCap.getFrame().size());
+                    webcam_image = this.camCap.getFrame();
 	            if( !webcam_image.empty() ) { 
                                     
                                     
@@ -147,12 +150,12 @@ public class ObjectTracker implements Runnable {
                         Imgproc.GaussianBlur(thresholded, thresholded, new Size(9,9),0,0);  
 			Imgproc.HoughCircles(thresholded, circles, Imgproc.CV_HOUGH_GRADIENT, 2, thresholded.height()/8, 200, 100, 0, 0);   
 			Imgproc.findContours(thresholded, contours, thresholded2, Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
-			Imgproc.drawContours(webcam_image, contours, -1, new Scalar(255, 0, 0), 2);   
+			//------Imgproc.drawContours(webcam_image, contours, -1, new Scalar(255, 0, 0), 2);   
 
-                        Core.circle(webcam_image, new Point(210,210), 10, new Scalar(100,10,10),3);  
+                        //------Core.circle(webcam_image, new Point(210,210), 10, new Scalar(100,10,10),3);  
 			data=webcam_image.get(210, 210);  
-			Core.putText(webcam_image,String.format("("+String.valueOf(data[0])+","+String.valueOf(data[1])+","+String.valueOf(data[2])+")"),new Point(30, 30) , 3 //FONT_HERSHEY_SCRIPT_SIMPLEX  
-				,1.0,new Scalar(100,10,10,255),3); 
+			//------Core.putText(webcam_image,String.format("("+String.valueOf(data[0])+","+String.valueOf(data[1])+","+String.valueOf(data[2])+")"),new Point(30, 30) , 3 //FONT_HERSHEY_SCRIPT_SIMPLEX  
+			//------	,1.0,new Scalar(100,10,10,255),3); 
                         //ArrayList<Float> errorAngles = new ArrayList<>();
                         ArrayList<Float> errorAngles = getTargetError();
                         
@@ -165,25 +168,21 @@ public class ObjectTracker implements Runnable {
                           }
                           float eXa = (errorAngles.get(0));
                           float eYa = (errorAngles.get(1));
-                          this.dh.setPixyXvalue( (int) eXa);
-                          this.dh.setPixyYvalue( (int) eYa);
+                          this.dh.setPixyXvalue(eXa);
+                          this.dh.setPixyYvalue(eYa);
                           
-                          System.out.print("AngleErrorX: "+errorAngles.get(0));
-                          System.out.println("       AngleErrorY: "+ errorAngles.get(1));
+                          //System.out.print("AngleErrorX: "+errorAngles.get(0));
+                          //System.out.println("       AngleErrorY: "+ errorAngles.get(1));
                           
                           semaphore.release();
                         
                         }         
                         }
                                                 
-                    else{
+                    /*else {
 				  
-			System.out.println(" --(!) No captured frame -- Break!");  
-			break;  
-			}                                         
-                                        
-               
-                                    
+			System.out.println(" --(!) No captured frame -- Break!"); 
+	            } */            
                }
     }
 

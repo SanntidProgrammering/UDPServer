@@ -25,7 +25,7 @@ import javax.imageio.ImageIO;
  *
  * @author Eivind Fugledal
  */
-public class CameraCapture {
+public class CameraCapture extends Thread {
     
     private VideoCapture capture;
     private Mat frame;
@@ -36,11 +36,15 @@ public class CameraCapture {
     public CameraCapture()
     {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        capture = new VideoCapture(0);
+        capture = new VideoCapture(-1);
         frame = new Mat();
         mob = new MatOfByte();
         cameraSender = new CameraSender();
-        
+    }
+    
+    @Override
+    public void run()
+    {
         this.capture();
     }
     
@@ -51,22 +55,25 @@ public class CameraCapture {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             buff = this.getBufferedImage();
             
-            try {
-                buff = this.scale(buff, buff.getType(), buff.getWidth(), buff.getHeight(), 1, 1);
+            if(buff != null)
+            {
+                try {
+                    buff = this.scale(buff, buff.getType(), buff.getWidth(), buff.getHeight(), 0.25, 0.25);
             
-                ImageIO.write(buff, "jpg", baos);
-                baos.flush();
-                byte[] imageInByte = baos.toByteArray();
-                baos.close();
+                    ImageIO.write(buff, "bmp", baos);
+                    baos.flush();
+                    byte[] imageInByte = baos.toByteArray();
+                    baos.close();
             
-                cameraSender.send(Main.ipAdress, imageInByte, 8765);
+                    cameraSender.send(Main.ipAdress, imageInByte, 8765);
                 
-                Thread.sleep(5);
+                    Thread.sleep(5);
             
-            } catch (IOException ex) {
-                Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(CameraCapture.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
@@ -80,7 +87,7 @@ public class CameraCapture {
             try {
                 capture.retrieve(frame);
                 this.setFrame(frame);
-               	Highgui.imencode(".jpg", frame, mob);
+               	Highgui.imencode(".bmp", frame, mob);
 		Image im;
                 im = ImageIO.read(new ByteArrayInputStream(mob.toArray()));
 	       	BufferedImage buff = (BufferedImage) im;
@@ -97,7 +104,7 @@ public class CameraCapture {
     {
         BufferedImage dbi = null;
         if(sbi != null) {
-            System.out.println(dWidth*fWidth);
+            //System.out.println(dWidth*fWidth);
             dbi = new BufferedImage((int) (dWidth*fWidth), (int) (dHeight*fHeight), imageType);
             Graphics2D g = dbi.createGraphics();
             AffineTransform at = AffineTransform.getScaleInstance(fWidth, fHeight);
