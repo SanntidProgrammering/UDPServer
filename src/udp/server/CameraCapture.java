@@ -14,6 +14,8 @@ import org.opencv.core.MatOfByte;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -115,12 +117,14 @@ public class CameraCapture extends Thread {
     
     private void setFrame(Mat frame)
     {
-        this.frame = frame;
+        //this.frame = frame;
+        this.frame = frame.clone();
     }
     
     public Mat getFrame()
     {
         return this.frame;
     }
+
     
 }
