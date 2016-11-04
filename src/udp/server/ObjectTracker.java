@@ -55,12 +55,12 @@ public class ObjectTracker implements Runnable {
     private Mat array255;
     private Mat distance;
     
-    private int hueMin = 35;
-    private int hueMax = 74;
-    private int satMin = 93;
-    private int satMax = 223;
-    private int valMin = 74;
-    private int valMax = 14335;
+    private int hueMin = 23;//35;
+    private int hueMax = 35;//74;
+    private int satMin = 70;//93;
+    private int satMax = 170;//223;
+    private int valMin = 78;//74;
+    private int valMax = 200;//14335;
     
     private double brightness;
     private double contrast;
@@ -255,9 +255,9 @@ public class ObjectTracker implements Runnable {
     
     
     private void setColorTrackingValues() {
-        double[] HsvMin = new double[]{35, 93, 74};
+        double[] HsvMin = new double[]{this.hueMin, this.satMin, this.valMin}; //{35, 93, 74};
         hsv_min.set(HsvMin);
-        double[] HsvMax = new double[]{74,223,14335};
+        double[] HsvMax = new double[]{this.hueMax, this.satMax, this.valMax}; //{74,223,14335};
         hsv_max.set(HsvMax);
         
         brightness = 1.0;
