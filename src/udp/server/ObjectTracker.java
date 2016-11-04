@@ -218,9 +218,9 @@ public class ObjectTracker implements Runnable {
         int x = getX(contours);
 	int y = getY(contours);
         contours.clear();
-                                                
+        angles = new ArrayList<>();                                         
         if(x>0){              
-        angles = new ArrayList<>();                                        
+                                               
         Core.circle(webcam_image, new Point(x, y), 4, new Scalar(50,49,0,255), 4);
 
         float centerX = webcam_image.width() / 2;
@@ -247,7 +247,11 @@ public class ObjectTracker implements Runnable {
         angles.add(angleErrorX);
         angles.add(angleErrorY);
 
-        }    
+        }  
+        else{
+        angles.add((float) 1000);
+        angles.add((float) 1000); 
+        }
         return angles;
     }
 
