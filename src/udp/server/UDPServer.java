@@ -6,6 +6,7 @@
 package udp.server;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.*;
 import java.util.Arrays;
 import java.util.concurrent.Semaphore;
@@ -61,7 +62,7 @@ public class UDPServer implements Runnable {
         } catch (SocketException ex) {
             System.out.println("Exception-.-.-.-.-.-.-.-.-.-.-.-");
             Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
-            
+
         } catch (IOException ex) {
             System.out.println("Exception-.-.-.-.-.-.-.-.-.-.-.-");
             Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -71,7 +72,7 @@ public class UDPServer implements Runnable {
     public void udpSend(byte[] data) {
         if (hasReceivedSomething) {
             DatagramPacket sendpacket
-                    = new DatagramPacket(data, data.length, guiIp, guiPort);
+                    = new DatagramPacket(data, data.length, guiIp, 9877);
             try {
                 serverSocket.send(sendpacket);
                 System.out.println(Arrays.toString(data) + " TO GUI, with ip: " + guiIp.toString() + " on port: " + guiPort);
@@ -91,7 +92,7 @@ public class UDPServer implements Runnable {
      */
     public void setDataToDatahandler(byte[] data) {
         this.acquire();
-        
+
         dh.setDataFromGUI(data);
 
         this.release();
@@ -106,9 +107,27 @@ public class UDPServer implements Runnable {
 
         if (requestCode != this.lastRequestCodeFromGui) {
 
+            byte[] sendData = new byte[6];
+
             this.acquire();
-            byte[] sendData = dh.getDataFromArduino();
+
+            int xAngle = (int) (100.0f * dh.getPixyXvalue());
+            int yAngle = (int) (100.0f * dh.getPixyYvalue());
+            byte distanceSensor = (byte) dh.getDistanceSensor();
+
             this.release();
+
+            byte[] x = new byte[2];
+             x = BigInteger.valueOf(xAngle).toByteArray();
+            byte[] y = new byte[2];
+            y = BigInteger.valueOf(yAngle).toByteArray();
+            System.out.println("x: " + Arrays.toString(x));
+            sendData[0] = x[0];
+            sendData[1] = x[1];
+            sendData[2] = y[0];
+            sendData[3] = y[1];
+            sendData[4] = distanceSensor;
+            sendData[5] = 0;
 
             this.udpSend(sendData);
 
