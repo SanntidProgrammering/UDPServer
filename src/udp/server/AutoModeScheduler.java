@@ -50,11 +50,16 @@ public class AutoModeScheduler extends TimerTask {
         acquire();
         xAngle = dh.getPixyXvalue();
         release();
-        output = limit(pid.getOutput(xAngle, setpoint),-pidOutputLimit,pidOutputLimit);
+        
+        output = pid.getOutput(xAngle, setpoint); // pid regulator
+        output = limit(output,-pidOutputLimit,pidOutputLimit); // begrens output
+        
         if (output != lastOutput) {
-            //                           max hastighet rett frem            %pådrag fra pid regulator
-            float leftSpeed = (float) ((255.0 * (speedFactor / 100.0)) * Math.abs(1 - (output / pidOutputLimit)));
-            float rightSpeed = (float) ((255.0 * (speedFactor / 100.0)) * Math.abs(1 + (output / pidOutputLimit)));
+            double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
+            double outputPidPercent = output/pidOutputLimit; // utgang fra pid i prosent av maks pådrag 
+            
+            float leftSpeed = (float) (speed * Math.abs(1 - outputPidPercent));
+            float rightSpeed = (float) (speed * Math.abs(1 + outputPidPercent));
             
             acquire();
             logic.runFWD(leftSpeed, rightSpeed);
