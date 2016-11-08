@@ -2,10 +2,18 @@ package udp.server;
 
 public class main_1 {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+
+        float number = 100f;
+
+        AUTOMODES result = setState(number);
+
+        System.out.println(result);
+
+        /*
 		// TODO Auto-generated method stub
                 double maxSpeed = 1.0;
 		MiniPID miniPID; 
@@ -47,14 +55,41 @@ public class main_1 {
 			
 			//if(i>80 && i%5==0)actual+=(Math.random()-.5)*20;
 		}
-		//*/
-		
-	}
-        
-        public static double limit(double a){
-            double MAX = 10.0;
-            double MIN = -10.0;
-            return (a > MAX) ? MAX : (a < MIN ? MIN : a);
+         */
+    }
+
+    public static double limit(double a) {
+        double MAX = 10.0;
+        double MIN = -10.0;
+        return (a > MAX) ? MAX : (a < MIN ? MIN : a);
+    }
+
+    public static AUTOMODES setState(float value) {
+        AUTOMODES result = AUTOMODES.FWD;
+        int intValue = Math.round(value);
+        if (intValue == AUTOMODES.SEARCH_LEFT.value) {
+            result = AUTOMODES.SEARCH_LEFT;
+
+        } else if (intValue == AUTOMODES.SEARCH_RIGHT.value) {
+            result = AUTOMODES.SEARCH_RIGHT;
         }
+        return result;
+    }
+
+    public static enum AUTOMODES {
+        FWD(1),
+        SEARCH_LEFT(-1000),
+        SEARCH_RIGHT(1000);
+
+        private int value;
+
+        private AUTOMODES(int value) {
+            this.value = value;
+        }
+
+        protected int getValue() {
+            return this.value;
+        }
+    }
 
 }
