@@ -22,7 +22,12 @@ public class Controller implements Runnable {
     private final Timer timer;
     private byte AUVstate;
     private byte lastAUVstate;
+    
+   
+    
     private final long PIDperiodeTime = 100;
+    
+    
 
     private Thread t;
 
@@ -62,6 +67,9 @@ public class Controller implements Runnable {
                 }
                 this.runManual();
             }
+            
+            
+            
             lastAUVstate = AUVstate;
         }
         this.cancelPID();
@@ -93,6 +101,8 @@ public class Controller implements Runnable {
             release();
         }
     }
+    
+
 
     private void startRequestFeedbacks() {
         Runnable run;

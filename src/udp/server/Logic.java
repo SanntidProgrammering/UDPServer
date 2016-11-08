@@ -287,6 +287,7 @@ public class Logic {
                 }
             };
             new Thread(run).start();
+           
         }
     }
 

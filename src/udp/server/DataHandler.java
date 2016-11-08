@@ -5,8 +5,7 @@
  */
 package udp.server;
 
-import java.math.BigInteger;
-import java.util.Arrays;
+
 
 /**
  * Overview protocol: To Arduino: Byte 0: bit 0 - stopp bit 1 - fwd bit 2 - rev
@@ -107,6 +106,10 @@ public class DataHandler {
             //this.setPixyYvalue(new BigInteger(Arrays.copyOfRange(data, 2, 4)).intValue());
             this.dataFromArduinoAvaliable = true;
         }
+    }
+
+    public byte[] getDataFromArduino() {
+        return dataFromArduino;
     }
 
     /**
