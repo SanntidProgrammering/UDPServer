@@ -26,8 +26,8 @@ public class UDPServer implements Runnable {
     private boolean hasReceivedSomething = false;
     private byte lastRequestCodeFromGui;
 
-    private Semaphore semaphore;
-    private DataHandler dh;
+    private final Semaphore semaphore;
+    private final DataHandler dh;
 
     public UDPServer(Semaphore semaphore, DataHandler dh) {
         this.semaphore = semaphore;
@@ -37,7 +37,6 @@ public class UDPServer implements Runnable {
     /**
      * Receives data from client, then sends it to the data handler
      *
-     * @throws Exception
      */
     @Override
     public void run() {
