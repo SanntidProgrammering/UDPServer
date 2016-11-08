@@ -38,13 +38,12 @@ public class Main {
         
         gd = new GUIData(dh, semaphore);
         controller = new Thread(new Controller(dh, semaphore));
-<<<<<<< HEAD
-        server = new Thread(new UDPServer(gd));
+
         camera = new CameraCapture();
         tracker = new Thread(new ObjectTracker(dh,semaphore,camera));
-=======
+
         server = new Thread(new UDPServer(semaphore,dh));
->>>>>>> pidBranch
+
         
         gd.start();
         controller.start();
