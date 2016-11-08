@@ -33,7 +33,7 @@ public class Main {
         
         gd = new GUIData(dh, semaphore);
         controller = new Thread(new Controller(dh, semaphore));
-        server = new Thread(new UDPServer(gd));
+        server = new Thread(new UDPServer(semaphore,dh));
         
         gd.start();
         controller.start();

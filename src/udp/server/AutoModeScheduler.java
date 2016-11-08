@@ -48,6 +48,8 @@ public class AutoModeScheduler extends TimerTask {
     private double D;
     private double pidOutputLimit = 10.0; // feks
     private double speedFactor = 70.0; // % fart av maksimal hastighet
+    
+    
 
     public AutoModeScheduler(DataHandler dh, Semaphore semaphore, Logic logic) {
         this.pid = new MiniPID(P, I, D);
