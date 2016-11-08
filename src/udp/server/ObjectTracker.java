@@ -122,7 +122,7 @@ public class ObjectTracker implements Runnable {
                while(true)  {
 		    //capture.read(webcam_image);  
                     //System.out.println(this.camCap.getFrame().size());
-                    webcam_image = this.camCap.getFrame();
+                    webcam_image = this.camCap.getFrame().clone();
 	            if( !webcam_image.empty() ) { 
                                     
                                     

@@ -6,7 +6,6 @@
 package udp.server;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.*;
 import java.util.Arrays;
 import java.util.concurrent.Semaphore;
@@ -20,8 +19,8 @@ import java.util.logging.Logger;
 public class UDPServer implements Runnable {
 
     private DatagramSocket serverSocket;
-    private InetAddress guiIp;
-    private int guiPort;
+
+
     private final int serverPort = 9876;
 
     private boolean hasReceivedSomething = false;
@@ -51,9 +50,8 @@ public class UDPServer implements Runnable {
                 serverSocket.receive(receivePacket);
                 //guiIp = receivePacket.getAddress();
                 Main.ipAdress = receivePacket.getAddress().getHostAddress();
-                guiPort = receivePacket.getPort();
 
-                System.out.println(Arrays.toString(receiveData) + " FROM GUI, with ip: " + Main.ipAdress + " on port: " + guiPort);
+                System.out.println(Arrays.toString(receiveData) + " FROM GUI, with ip: " + Main.ipAdress );
 
                 this.setDataToDatahandler(receiveData);
                 hasReceivedSomething = true;
@@ -77,7 +75,7 @@ public class UDPServer implements Runnable {
                         = new DatagramPacket(data, data.length, InetAddress.getByName(Main.ipAdress), 9877);
                 try {
                     serverSocket.send(sendpacket);
-                    System.out.println(Arrays.toString(data) + " TO GUI, with ip: " + Main.ipAdress + " on port: " + guiPort);
+                    System.out.println(Arrays.toString(data) + " TO GUI, with ip: " + Main.ipAdress);
                 } catch (IOException ex) {
                     Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
                 }
