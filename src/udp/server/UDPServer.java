@@ -79,7 +79,7 @@ public class UDPServer implements Runnable {
                 Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            System.out.println("NEI FAEN NO HAR DU KØDDA DET TIL");
+            System.out.println("UDP is not ready. missing IP address for GUI");
         }
     }
 
