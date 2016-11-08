@@ -49,10 +49,11 @@ public class UDPServer implements Runnable {
             while (dh.shouldThreadRun()) {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.receive(receivePacket);
-                guiIp = receivePacket.getAddress();
+                //guiIp = receivePacket.getAddress();
+                Main.ipAdress = receivePacket.getAddress().getHostAddress();
                 guiPort = receivePacket.getPort();
 
-                System.out.println(Arrays.toString(receiveData) + " FROM GUI, with ip: " + guiIp.toString() + " on port: " + guiPort);
+                System.out.println(Arrays.toString(receiveData) + " FROM GUI, with ip: " + Main.ipAdress + " on port: " + guiPort);
 
                 this.setDataToDatahandler(receiveData);
                 hasReceivedSomething = true;
@@ -71,12 +72,16 @@ public class UDPServer implements Runnable {
 
     public void udpSend(byte[] data) {
         if (hasReceivedSomething) {
-            DatagramPacket sendpacket
-                    = new DatagramPacket(data, data.length, guiIp, 9877);
             try {
-                serverSocket.send(sendpacket);
-                System.out.println(Arrays.toString(data) + " TO GUI, with ip: " + guiIp.toString() + " on port: " + guiPort);
-            } catch (IOException ex) {
+                DatagramPacket sendpacket
+                        = new DatagramPacket(data, data.length, InetAddress.getByName(Main.ipAdress), 9877);
+                try {
+                    serverSocket.send(sendpacket);
+                    System.out.println(Arrays.toString(data) + " TO GUI, with ip: " + Main.ipAdress + " on port: " + guiPort);
+                } catch (IOException ex) {
+                    Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (UnknownHostException ex) {
                 Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
@@ -118,9 +123,9 @@ public class UDPServer implements Runnable {
             this.release();
 
             byte[] x = new byte[2];
-             x = BigInteger.valueOf(xAngle).toByteArray();
+             x = intToByteArray(xAngle);
             byte[] y = new byte[2];
-            y = BigInteger.valueOf(yAngle).toByteArray();
+            y = intToByteArray(yAngle);
             System.out.println("x: " + Arrays.toString(x));
             sendData[0] = x[0];
             sendData[1] = x[1];
@@ -134,6 +139,13 @@ public class UDPServer implements Runnable {
             this.lastRequestCodeFromGui = requestCode;
         }
 
+    }
+    
+    public static final byte[] intToByteArray(int value){
+        return new byte[] {
+            (byte)(value >>> 8),
+            (byte)(value)};
+        
     }
 
     private void acquire() {

@@ -65,6 +65,9 @@ public class ObjectTracker implements Runnable {
     private double brightness;
     private double contrast;
     
+    private float angleErrorX;
+    private float angleErrorY;
+    
     List<MatOfPoint> contours;
     
     public ObjectTracker(DataHandler dh, Semaphore semaphore, CameraCapture camCap){
@@ -239,19 +242,27 @@ public class ObjectTracker implements Runnable {
         float pixErrorY = -y + centerY;
                                                   
         // Calculate angle error in x and y direction
-        float angleErrorX = (pixErrorX/centerX)*cameraAngleX;
-        float angleErrorY = (pixErrorY/centerY)*cameraAngleY;
+        angleErrorX = (pixErrorX/centerX)*cameraAngleX;
+        angleErrorY = (pixErrorY/centerY)*cameraAngleY;
         Core.line(webcam_image, new Point(x,y), new Point(centerX,centerY), new Scalar(150,150,100)/*CV_BGR(100,10,10)*/, 3);  
         
         //angles = new float[]{angleErrorX, angleErrorY};
-        angles.add(angleErrorX);
-        angles.add(angleErrorY);
+        //angles.add(angleErrorX);
+        //angles.add(angleErrorY);
 
         }  
         else{
-        angles.add((float) 255);
-        angles.add((float) 255); 
+           if(angleErrorX > 0){
+            angleErrorX = 255;
+            angleErrorY = 255;
+           }
+           else{
+            angleErrorX = -255;
+            angleErrorY = -255;
+           }   
         }
+        angles.add(angleErrorX);
+        angles.add(angleErrorY);
         return angles;
     }
 

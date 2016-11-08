@@ -117,8 +117,8 @@ public class CameraCapture extends Thread {
     
     private void setFrame(Mat frame)
     {
-        //this.frame = frame;
-        this.frame = frame.clone();
+        this.frame = frame;
+        //this.frame = frame.clone();
     }
     
     public Mat getFrame()

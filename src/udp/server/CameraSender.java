@@ -7,6 +7,7 @@ package udp.server;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Arrays;
 import java.util.logging.*;
 
 /**
@@ -47,8 +48,10 @@ public class CameraSender {
                                         InetAddress.getByName(ipAddress),
                                         port);
             clientSocket.send(packet);
-             //System.out.println(Arrays.toString(data));
+            //System.out.println(data.length + "   PORT " + port);
+            //System.out.println(Arrays.toString(data));
             //System.out.println("UDP send");
+            //System.out.println(ipAddress);
         } catch (IOException ex) {
             Logger.getLogger(CameraSender.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
