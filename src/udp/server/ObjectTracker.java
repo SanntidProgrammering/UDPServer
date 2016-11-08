@@ -249,8 +249,8 @@ public class ObjectTracker implements Runnable {
 
         }  
         else{
-        angles.add((float) 1000);
-        angles.add((float) 1000); 
+        angles.add((float) 255);
+        angles.add((float) 255); 
         }
         return angles;
     }

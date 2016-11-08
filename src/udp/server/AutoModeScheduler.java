@@ -18,8 +18,8 @@ public class AutoModeScheduler extends TimerTask {
 
     private static enum AUTOMODES {
         FWD(1),
-        SEARCH_LEFT(-1000),
-        SEARCH_RIGHT(1000);
+        SEARCH_LEFT(-255),
+        SEARCH_RIGHT(255);
 
         private int value;
 
