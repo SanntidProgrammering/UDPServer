@@ -32,8 +32,9 @@ public class SerialWriter implements Runnable {
                 if (datahandler.checkSendDataAvailable()) {
                     acquire();
                     byte[] sendByte = datahandler.getDataFromController();
+                    
                     release();
-                    System.out.println(Arrays.toString(sendByte) + "SERIAL");
+                    System.out.println(Arrays.toString(sendByte) + " TO SERIAL");
                     this.out.write(sendByte);
                     this.out.flush();
                 }

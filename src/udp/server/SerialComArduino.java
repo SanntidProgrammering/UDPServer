@@ -40,15 +40,15 @@ public class SerialComArduino
                 SerialPort serialPort = (SerialPort) commPort;
                 serialPort.setSerialPortParams(19200,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
                 serialPort.disableReceiveTimeout();
-                serialPort.enableReceiveThreshold(1);
+                serialPort.enableReceiveThreshold(6);
                 InputStream in = serialPort.getInputStream();
                 OutputStream out = serialPort.getOutputStream();
                 
-                //reader = new Thread(new SerialReader(in,datahandler, semaphore));
+                reader = new Thread(new SerialReader(in,datahandler, semaphore));
                 writer = new Thread(new SerialWriter(out,datahandler, semaphore));
                 
                 writer.start();
-                //reader.start();
+                reader.start();
 
             }
             else

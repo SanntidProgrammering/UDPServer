@@ -44,6 +44,10 @@ public class Logic {
     private final DataHandler dh;
     private final int maxSpeed = 255;
     private final int minSpeed = 0;
+    private final int distanceToHitBall = 17;
+    
+    private boolean isServoOut = false;
+    
     private STATES state;
 
 
@@ -61,6 +65,8 @@ public class Logic {
      * run this method when vehicle is in manual mode, controlled from gui
      */
     protected void prossesButtonCommandsFromGui() {
+        // vehicle is in manual mode
+        this.isServoOut = false;
         this.handleButtonStates();
         this.handleServoStatesFromGui();
         this.switchCaseButtonStates();
@@ -255,16 +261,10 @@ public class Logic {
      * sets the servo motors (manual mode)
      */
     protected void handleServoStatesFromGui() {
-        if (dh.getLeftServo() == 1) {
-            dh.setLeftServo();
+        if (dh.getServoFromGui() == 1) {
+            dh.setServoToArduino();
         } else {
-            dh.resetLeftServo();
-        }
-
-        if (dh.getRightServo() == 1) {
-            dh.setRightServo();
-        } else {
-            dh.resetRightServo();
+            dh.resetServoToArduino();
         }
     }
 
@@ -274,14 +274,17 @@ public class Logic {
      * @param distance the distance that triggers the servo
      */
     protected void decideToHitBallOrNot(int distance) {
-        if (distance >= dh.getDistanceSensor()) {
-
+        if (distance <= this.distanceToHitBall && !this.isServoOut) {
+            
             // starter bakgrunnstråd og holder servo ute en stund selv om metoden returnerer
             Runnable run = () -> {
                 try {
-                    dh.setLeftServo();
-                    Thread.sleep(2000);
-                    dh.resetLeftServo();
+                    // kaller uten semafore. bare et bit som skrus av eller på.
+                    dh.setServoToArduino();
+                    isServoOut = true;
+                    Thread.sleep(1000);
+                    dh.resetServoToArduino();
+                    isServoOut = false;
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
                 }

@@ -105,7 +105,7 @@ public class UDPServer implements Runnable {
         byte requestCode;
 
         this.acquire();
-        requestCode = dh.getRequestCode();
+        requestCode = dh.getRequestCodeFromGui();
         this.release();
 
         if (requestCode != this.lastRequestCodeFromGui) {
@@ -130,7 +130,7 @@ public class UDPServer implements Runnable {
             sendData[2] = y[0];
             sendData[3] = y[1];
             sendData[4] = distanceSensor;
-            sendData[5] = 0;
+            sendData[5] = requestCode;
 
             this.udpSend(sendData);
 

@@ -101,7 +101,7 @@ public class DataHandler {
         if (data.length == this.dataFromArduino.length && data[Protocol.REQUEST_FEEDBACK.getValue()] != this.getRequestCodeFromArduino()) {
             this.dataFromArduino = data;
             this.setDistanceSensor(data[4]);
-            this.setRequestCodeFromArduino(data[5]);
+            this.setRequestCodeFromArduino(data[Protocol.REQUEST_FEEDBACK.getValue()]);
             //this.setPixyXvalue(new BigInteger(Arrays.copyOfRange(data, 0, 2)).intValue());
             //this.setPixyYvalue(new BigInteger(Arrays.copyOfRange(data, 2, 4)).intValue());
             this.dataFromArduinoAvaliable = true;
@@ -174,6 +174,8 @@ public class DataHandler {
         this.distanceSensor = distanceSensor;
     }
 
+    
+    
     /**
      * Gets request code from Arduino
      *
@@ -216,7 +218,7 @@ public class DataHandler {
         
         // Values below should be equal in both dataFromGui and dataToArduino
         //this.dataToArduino[Protocol.CONTROLS.getValue()] = this.dataFromGui[Protocol.CONTROLS.getValue()];
-        this.dataToArduino[Protocol.COMMANDS.getValue()] = this.dataFromGui[Protocol.COMMANDS.getValue()];
+        //this.dataToArduino[Protocol.COMMANDS.getValue()] = this.dataFromGui[Protocol.COMMANDS.getValue()];
         this.dataToArduino[Protocol.SENSITIVITY.getValue()] = this.dataFromGui[Protocol.SENSITIVITY.getValue()];
         
         this.fireStateChanged();
@@ -418,43 +420,19 @@ public class DataHandler {
         else
             return dataToArduino[Protocol.RIGHT_MOTOR_SPEED.getValue()] * (100 / this.getSensitivity());
     }
-
-    /**
-     * Sets left servo bit to high
-     */
-    public void setLeftServo() {
-        dataToArduino[Protocol.COMMANDS.getValue()] = this.setBit(dataToArduino[Protocol.COMMANDS.getValue()], Protocol.commands.LEFT_SERVO.getValue());
-        this.fireStateChanged();
-    }
-
-    /**
-     * Sets left servo bit to low
-     */
-    public void resetLeftServo() {
-        dataToArduino[Protocol.COMMANDS.getValue()] = this.releaseBit(dataToArduino[Protocol.COMMANDS.getValue()], Protocol.commands.LEFT_SERVO.getValue());
-        this.fireStateChanged();
-    }
-    
-    /**
-     * get left servo status from gui
-     * @return byte, value 0 or 1
-     */
-    public byte getLeftServo(){
-        return this.getBit(dataFromGui[Protocol.COMMANDS.getValue()], Protocol.commands.LEFT_SERVO.getValue());
-    }
-    
+      
     /**
      * get right servo status from gui
      * @return byte, value 0 or 1
      */
-    public byte getRightServo(){
+    public byte getServoFromGui(){
         return this.getBit(dataFromGui[Protocol.COMMANDS.getValue()], Protocol.commands.RIGHT_SERVO.getValue());
     }
     
     /**
      * Sets right servo bit to high
      */
-    public void setRightServo() {
+    public void setServoToArduino() {
         dataToArduino[Protocol.COMMANDS.getValue()] = this.setBit(dataToArduino[Protocol.COMMANDS.getValue()], Protocol.commands.RIGHT_SERVO.getValue());
         this.fireStateChanged();
     }
@@ -462,7 +440,7 @@ public class DataHandler {
     /**
      * Sets right servo bit to low
      */
-    public void resetRightServo() {
+    public void resetServoToArduino() {
         dataToArduino[Protocol.COMMANDS.getValue()] = this.releaseBit(dataToArduino[Protocol.COMMANDS.getValue()], Protocol.commands.RIGHT_SERVO.getValue());
         this.fireStateChanged();
     }
@@ -534,18 +512,23 @@ public class DataHandler {
      *
      * @return The request code
      */
-    public byte getRequestCode() {
+    public byte getRequestCodeFromGui() {
         return this.dataFromGui[Protocol.REQUEST_FEEDBACK.getValue()];
     }
 
     public void incrementRequestCode() {
-        dataToArduino[5]++;
+        dataToArduino[Protocol.REQUEST_FEEDBACK.getValue()]++;
         this.fireStateChanged();
     }
+    
+    public void setRequestCodeToArduino(byte code){
+        dataToArduino[Protocol.REQUEST_FEEDBACK.getValue()] = code;
+        this.fireStateChanged();
+    }
+    
 
     public void fireStateChanged() {
         Main.enumStateEvent = SendEventState.TRUE;
-        //notifyAll();
     }
 
     public boolean checkSendDataAvailable() {

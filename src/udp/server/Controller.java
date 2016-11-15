@@ -19,15 +19,12 @@ public class Controller implements Runnable {
     private final DataHandler dh;
     private final Semaphore semaphore;
     private final Logic logic;
-    private final Timer timer;
+    private Timer timer;
     private byte AUVstate;
     private byte lastAUVstate;
-    
-   
-    
+    private boolean autoRunning;
+
     private final long PIDperiodeTime = 100;
-    
-    
 
     private Thread t;
 
@@ -46,63 +43,94 @@ public class Controller implements Runnable {
     @Override
     public void run() {
 
-        this.startRequestFeedbacks();
-        acquire();
-        boolean run = dh.shouldThreadRun();
-        release();
-
-        while (run) {
+        //this.startRequestFeedbacks();
+        while (dh.shouldThreadRun()) {
             acquire();
-            run = dh.shouldThreadRun();
+
+            boolean guiCommandUpdated = dh.getDataFromGuiAvailable();
+            if (guiCommandUpdated) {
+                byte controlByte = dh.getFromGuiByte((byte) Protocol.COMMANDS.getValue());
+                
+                // auto or manual mode
+                if (getBit(controlByte, Protocol.commands.AUTO_MANUAL.getValue())) {
+                    dh.AUVautoMode();
+                } else {
+                    dh.AUVmanualMode();
+                }
+                
+                // start or stop vehicle
+                if(getBit(controlByte, Protocol.commands.START.getValue())) {
+                    dh.enableAUV();
+                } else {
+                    dh.disableAUV();
+                }
+                // finish prosessing commands from gui
+                dh.setDataFromGuiAvailable(false);
+            }
+            
             AUVstate = dh.getAUVautoMode();
             release();
-            if (AUVstate == 1 && lastAUVstate == 0) {
-                // start ny pid regulering
-                timer.scheduleAtFixedRate(new AutoModeScheduler(dh, semaphore, logic), 0, PIDperiodeTime);
+
+            if (AUVstate == 1 && lastAUVstate == 0 && !this.autoRunning) {
+                this.startPID();
 
             } else if (AUVstate == 0) {
                 if (lastAUVstate == 1) {
                     // skifter til manuell modus, stopp timer task på pid
-                    this.cancelPID();
+                    if (this.autoRunning) {
+                        this.cancelPID();
+
+                    }
                 }
-                this.runManual();
+                if (guiCommandUpdated) {
+                    this.runManual();
+                }
             }
-            
-            
-            
+
             lastAUVstate = AUVstate;
         }
         this.cancelPID();
     }
 
     /**
+     * start scheduler PID
+     */
+    private void startPID() {
+        try {
+            timer = new Timer();
+            timer.scheduleAtFixedRate(new AutoModeScheduler(dh, semaphore, logic), 0, PIDperiodeTime);
+            this.autoRunning = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * stop scheduler PID
      */
     private void cancelPID() {
-        timer.cancel();
-        timer.purge();
+        try {
+            timer.cancel();
+            //timer.purge();
+            this.autoRunning = false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Logic while running in manual mode
      */
     private void runManual() {
-        if (dh.getDataFromGuiAvailable()) {
-            acquire();
-            
-            if (dh.isDataFromArduinoAvailable()) {
-                System.out.println("Camera x value: " + dh.getPixyXvalue());
-                System.out.println("Camera y value: " + dh.getPixyYvalue());
-                System.out.println("Distance: " + dh.getDistanceSensor());
-            }
-            logic.prossesButtonCommandsFromGui();
+        acquire();
 
-            dh.setDataFromGuiAvailable(false);
-            release();
-        }
+        logic.prossesButtonCommandsFromGui();
+        // set requestCode from GUI to arduino
+        dh.setRequestCodeToArduino(dh.getRequestCodeFromGui());
+
+        //dh.setDataFromGuiAvailable(false);
+        release();
     }
-    
-
 
     private void startRequestFeedbacks() {
         Runnable run;
@@ -132,5 +160,16 @@ public class Controller implements Runnable {
 
     private void release() {
         semaphore.release();
+    }
+
+    /**
+     * Gets a specific bit in a specific byte
+     *
+     * @param b The specific byte
+     * @param bit The specific bit
+     * @return Value of the bit
+     */
+    private boolean getBit(byte b, int bit) {
+        return ((b >> bit) == 1);
     }
 }

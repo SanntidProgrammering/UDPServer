@@ -25,7 +25,7 @@ public class Main {
     static SendEventState enumStateEvent;
     protected static String ipAdress;
     private static CameraCapture camera;
-    private static String[] comport = {"/dev/ttyUSB0", "COM3"};
+    private static String[] comport = {"/dev/ttyUSB0", "COM3","/dev/ttyACM0","/dev/ttyACM1","/dev/ttyACM2","/dev/ttyACM99"};
     
     /**
      * @param args the command line arguments
@@ -54,7 +54,7 @@ public class Main {
         
         SerialComArduino sca = new SerialComArduino(dh);
         try {
-            sca.connect(comport[0], semaphore);
+            sca.connect(comport[4], semaphore);
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

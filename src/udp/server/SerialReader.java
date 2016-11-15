@@ -32,11 +32,11 @@ public class SerialReader implements Runnable {
             try {
                 byte[] data = new byte[6];
                 in.read(data,0,data.length);
-                System.out.println(Arrays.toString(data));
+                System.out.println(Arrays.toString(data)+ "FROM SERIAL");
                 
                 semaphore.acquire();   
-                
                 dh.handleDataFromArduino(data);
+                
             } catch (InterruptedException ex) {
                 Logger.getLogger(SerialWriter.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
