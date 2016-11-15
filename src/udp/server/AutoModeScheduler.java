@@ -43,26 +43,27 @@ public class AutoModeScheduler extends TimerTask {
     private double output;
     private double lastOutput;
 
-    private final double P = 0.9;
+    private final double P = 0.3;
     private final double I = 0.1;
-    private final double D = 0.0;
+    private final double D = 0.1;
+    private final double F = 0.5;
     
     
-    private final double pidOutputLimit = 10.0; // feks
-    private final double speedFactor = 70.0; // % fart av maksimal hastighet
+    private final double pidOutputLimit = 100.0; // feks
+    private final double speedFactor = 50.0; // % fart av maksimal hastighet
     
     
 
     public AutoModeScheduler(DataHandler dh, Semaphore semaphore, Logic logic) {
-        this.pid = new MiniPID(P, I, D);
+        this.pid = new MiniPID(P, I, D, F);
         this.semaphore = semaphore;
         this.dh = dh;
         this.logic = logic;
 
         this.pid.setOutputLimits(pidOutputLimit);
-        this.pid.setMaxIOutput(2);
-        //miniPID.setOutputRampRate(3);
-        this.pid.setOutputFilter(.3);
+        //this.pid.setMaxIOutput(2);
+        pid.setOutputRampRate(5.0);
+        this.pid.setOutputFilter(.01);
         //miniPID.setSetpointRange(40);
     }
 
@@ -113,7 +114,8 @@ public class AutoModeScheduler extends TimerTask {
 
             float leftSpeed = (float) (speed * Math.abs(1 + outputPidPercent));
             float rightSpeed = (float) (speed * Math.abs(1 - outputPidPercent));
-
+            System.out.println("*************************************" + "PID OUTPUT: " + outputPidPercent + " SPEEDS, LEFT: " + leftSpeed + " RIGHT: " + rightSpeed);
+            
             acquire();
             logic.runFWD(leftSpeed, rightSpeed);
             logic.decideToHitBallOrNot(dh.getDistanceSensor());

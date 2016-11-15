@@ -54,7 +54,7 @@ public class Main {
         
         SerialComArduino sca = new SerialComArduino(dh);
         try {
-            sca.connect(comport[4], semaphore);
+            sca.connect(comport[2], semaphore);
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
