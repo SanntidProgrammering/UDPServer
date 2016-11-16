@@ -46,6 +46,9 @@ class MiniPID{
   MiniPID(double p, double i, double d, double f){
     P=p; I=i; D=d; F=f;
     }
+  MiniPID(){
+      
+  }
   
   //**********************************
   //Configuration functions

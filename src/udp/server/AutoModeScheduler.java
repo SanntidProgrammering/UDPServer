@@ -43,19 +43,17 @@ public class AutoModeScheduler extends TimerTask {
     private double output;
     private double lastOutput;
 
-    private final double P = 0.3;
-    private final double I = 0.1;
-    private final double D = 0.1;
-    private final double F = 0.5;
-    
-    
+    private double P;
+    private double I;
+    private double D;
+    private double F;
+    private double RR;
+
     private final double pidOutputLimit = 100.0; // feks
-    private final double speedFactor = 50.0; // % fart av maksimal hastighet
-    
-    
+    private final double speedFactor = 60.0; // % fart av maksimal hastighet
 
     public AutoModeScheduler(DataHandler dh, Semaphore semaphore, Logic logic) {
-        this.pid = new MiniPID(P, I, D, F);
+        this.pid = new MiniPID();
         this.semaphore = semaphore;
         this.dh = dh;
         this.logic = logic;
@@ -69,11 +67,31 @@ public class AutoModeScheduler extends TimerTask {
 
     @Override
     public void run() {
+
+        // flag to check if pid parameters has changed
+        boolean pidChanged = false;
+
         acquire();
         xAngle = (double) dh.getPixyXvalue();
-        
+
+        // get pid paramters if new values are available
+        if (dh.getPidParamChanged()) {
+            P = dh.getP();
+            I = dh.getI();
+            D = dh.getD();
+            F = dh.getF();
+            RR = dh.getRR();
+            pidChanged = true;
+            // new values has been stored
+            dh.setPidParamChanged(false);
+        }
         release();
         state = this.setState(xAngle);
+
+        if (pidChanged) {
+            pid.setPID(P, I, D, F);
+            pid.setOutputRampRate(RR);
+        }
 
         switch (state) {
             case FWD:
@@ -86,8 +104,7 @@ public class AutoModeScheduler extends TimerTask {
                 this.searchRight();
                 break;
         }
-        
-        
+
     }
 
     private void acquire() {
@@ -102,7 +119,7 @@ public class AutoModeScheduler extends TimerTask {
     private void release() {
         semaphore.release();
     }
-    
+
     private void advance() {
 
         output = pid.getOutput(xAngle, setpoint); // pid regulator
@@ -112,10 +129,10 @@ public class AutoModeScheduler extends TimerTask {
             double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
             double outputPidPercent = output / pidOutputLimit; // utgang fra pid i prosent av maks pådrag 
 
-            float leftSpeed = (float) (speed * Math.abs(1 + outputPidPercent));
-            float rightSpeed = (float) (speed * Math.abs(1 - outputPidPercent));
+            float leftSpeed  = (float) min((speed * Math.abs(1 + outputPidPercent)), 255f);
+            float rightSpeed = (float) min((speed * Math.abs(1 - outputPidPercent)), 255f);
             System.out.println("*************************************" + "PID OUTPUT: " + outputPidPercent + " SPEEDS, LEFT: " + leftSpeed + " RIGHT: " + rightSpeed);
-            
+
             acquire();
             logic.runFWD(leftSpeed, rightSpeed);
             logic.decideToHitBallOrNot(dh.getDistanceSensor());
@@ -126,11 +143,11 @@ public class AutoModeScheduler extends TimerTask {
     }
 
     private void searchLeft() {
-        double percentTurnSpeed = 0.80d;
+        double percentTurnSpeed = 0.90d;
         double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
 
-        float leftSpeed = (float) (speed * Math.abs(1 + percentTurnSpeed));
-        float rightSpeed = (float) (speed * Math.abs(1 - percentTurnSpeed));
+        float leftSpeed = (float) min((speed * Math.abs(1 + percentTurnSpeed)), 255f);
+        float rightSpeed = (float) min((speed * Math.abs(1 - percentTurnSpeed)), 255f);
 
         acquire();
         logic.runFWD(leftSpeed, rightSpeed);
@@ -139,11 +156,11 @@ public class AutoModeScheduler extends TimerTask {
     }
 
     private void searchRight() {
-        double percentTurnSpeed = -0.80d;
+        double percentTurnSpeed = -0.90d;
         double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
 
-        float leftSpeed = (float) (speed * Math.abs(1 + percentTurnSpeed));
-        float rightSpeed = (float) (speed * Math.abs(1 - percentTurnSpeed));
+        float leftSpeed = (float) min((speed * Math.abs(1 + percentTurnSpeed)),255f);
+        float rightSpeed = (float) min((speed * Math.abs(1 - percentTurnSpeed)),255f);
 
         acquire();
         logic.runFWD(leftSpeed, rightSpeed);
@@ -153,6 +170,10 @@ public class AutoModeScheduler extends TimerTask {
 
     private double limit(double a, double MIN, double MAX) {
         return (a > MAX) ? MAX : (a < MIN ? MIN : a);
+    }
+
+    private double min(double a, double MIN) {
+        return MIN < a ? MIN : a;
     }
 
     private AUTOMODES setState(double value) {

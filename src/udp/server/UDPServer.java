@@ -43,7 +43,7 @@ public class UDPServer implements Runnable {
         try {
             serverSocket = new DatagramSocket(serverPort);
 
-            byte[] receiveData = new byte[6];
+            byte[] receiveData = new byte[11];
 
             while (dh.shouldThreadRun()) {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);

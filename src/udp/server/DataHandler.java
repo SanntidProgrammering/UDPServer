@@ -5,8 +5,6 @@
  */
 package udp.server;
 
-
-
 /**
  * Overview protocol: To Arduino: Byte 0: bit 0 - stopp bit 1 - fwd bit 2 - rev
  * bit 3 - left bit 4 - right Byte 1: Left motor speed Byte 2: Right motor speed
@@ -32,6 +30,14 @@ public class DataHandler {
     private int distanceSensor;
     private byte requestCodeFromArduino;
     private boolean enableAUV;
+
+    // pid parameters
+    private double P; // prop gain
+    private double I; // integral gain
+    private double D; // derivation gain
+    private double F; // feed fwd gain
+    private double RR; // output ramp rate (max delta output)
+    private boolean PIDparamChanged;
 
     public DataHandler() {
         this.dataFromArduino = new byte[6];
@@ -92,6 +98,36 @@ public class DataHandler {
      */
     public void setThreadStatus(boolean threadStatus) {
         this.threadStatus = threadStatus;
+    }
+
+    //*****************************************************************
+    //*************** PID PARAMTERS ***********************************
+    public double getP() {
+        return P;
+    }
+
+    public double getI() {
+        return I;
+    }
+
+    public double getD() {
+        return D;
+    }
+
+    public double getF() {
+        return F;
+    }
+
+    public double getRR() {
+        return RR;
+    }
+
+    public void setPidParamChanged(boolean state) {
+        this.PIDparamChanged = state;
+    }
+
+    public boolean getPidParamChanged() {
+        return this.PIDparamChanged;
     }
 
     //*****************************************************************
@@ -174,8 +210,6 @@ public class DataHandler {
         this.distanceSensor = distanceSensor;
     }
 
-    
-    
     /**
      * Gets request code from Arduino
      *
@@ -212,49 +246,80 @@ public class DataHandler {
      * @param data New byte array
      */
     public void setDataFromGUI(byte[] data) {
-        this.dataFromGui = data;
-        
+
+        for (int i = 0; i < 6; i++) {
+            this.dataFromGui[i] = data[i];
+        }
+
+        // pid parameters
+        double P = (double) data[6] / 10.0;
+        double I = (double) data[7] / 10.0;
+        double D = (double) data[8] / 10.0;
+        double F = (double) data[9] / 10.0;    // feed fwd
+        double RR = (double) data[10] / 10.0; // ramp rate
+
+        // set new values if value changed
+        if (P != this.P) {
+            this.P = P;
+            this.PIDparamChanged = true;
+        }
+        if (I != this.I) {
+            this.I = I;
+            this.PIDparamChanged = true;
+        }
+        if (D != this.D) {
+            this.D = D;
+            this.PIDparamChanged = true;
+        }
+        if (F != this.F) {
+            this.F = F;
+            this.PIDparamChanged = true;
+        }
+        if (RR != this.RR) {
+            this.RR = RR;
+            this.PIDparamChanged = true;
+        }
+
         this.setDataFromGuiAvailable(true);
-        
+
         // Values below should be equal in both dataFromGui and dataToArduino
         //this.dataToArduino[Protocol.CONTROLS.getValue()] = this.dataFromGui[Protocol.CONTROLS.getValue()];
         //this.dataToArduino[Protocol.COMMANDS.getValue()] = this.dataFromGui[Protocol.COMMANDS.getValue()];
         this.dataToArduino[Protocol.SENSITIVITY.getValue()] = this.dataFromGui[Protocol.SENSITIVITY.getValue()];
-        
+
         this.fireStateChanged();
     }
-    
+
     /**
      * Sets boolean flag to true or false depending on if there are new data
      * available from GUI or not
+     *
      * @param state true or false
      */
-    public void setDataFromGuiAvailable(boolean state)
-    {
+    public void setDataFromGuiAvailable(boolean state) {
         this.dataFromGuiAvailable = state;
     }
-    
+
     /**
      * Returns boolean flag
+     *
      * @return true if new data available, false if not
      */
-    public boolean getDataFromGuiAvailable()
-    {
+    public boolean getDataFromGuiAvailable() {
         return this.dataFromGuiAvailable;
     }
-    
+
     /**
      * Returns a specific byte from byte array from GUI
+     *
      * @param b The specific byte
      * @return The byte
      */
-    public byte getFromGuiByte(byte b)
-    {
+    public byte getFromGuiByte(byte b) {
         return dataFromGui[b];
     }
-    
-    public void resetToArduinoByte(int i)
-    {
+
+    public void resetToArduinoByte(int i) {
         dataToArduino[i] = 0;
     }
 
@@ -273,14 +338,13 @@ public class DataHandler {
         dataToArduino[Protocol.CONTROLS.getValue()] = this.releaseBit(dataToArduino[Protocol.CONTROLS.getValue()], Protocol.controls.STOP.getValue());
         //this.fireStateChanged();
     }
-    
+
     /**
      * Gets value of stop bit
      *
      * @return stop bit
      */
-    public byte getStopAUV()
-    {
+    public byte getStopAUV() {
         return this.getBit(dataFromGui[Protocol.CONTROLS.getValue()], Protocol.controls.STOP.getValue());
     }
 
@@ -390,17 +454,20 @@ public class DataHandler {
      * @param speed Speed value between 0-255
      */
     public void setLeftMotorSpeed(float speed) {
+        if (speed > 255.0f) {
+            speed = 255.0f;
+        }
         dataToArduino[Protocol.LEFT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
-              
+
     }
-    
-    public int getLeftMotorSpeed()
-    {
-        if(this.getSensitivity() == 0)
+
+    public int getLeftMotorSpeed() {
+        if (this.getSensitivity() == 0) {
             return 0;
-        else
+        } else {
             return dataToArduino[Protocol.LEFT_MOTOR_SPEED.getValue()] * (100 / this.getSensitivity());
+        }
     }
 
     /**
@@ -409,26 +476,30 @@ public class DataHandler {
      * @param speed Speed value between 0-255
      */
     public void setRightMotorSpeed(float speed) {
+        if (speed > 255.0f) {
+            speed = 255.0f;
+        }
         dataToArduino[Protocol.RIGHT_MOTOR_SPEED.getValue()] = (byte) ((speed / 100) * this.getSensitivity());
         this.fireStateChanged();
     }
-    
-    public int getRightMotorSpeed()
-    {
-        if(this.getSensitivity() == 0)
+
+    public int getRightMotorSpeed() {
+        if (this.getSensitivity() == 0) {
             return 0;
-        else
+        } else {
             return dataToArduino[Protocol.RIGHT_MOTOR_SPEED.getValue()] * (100 / this.getSensitivity());
+        }
     }
-      
+
     /**
      * get right servo status from gui
+     *
      * @return byte, value 0 or 1
      */
-    public byte getServoFromGui(){
+    public byte getServoFromGui() {
         return this.getBit(dataFromGui[Protocol.COMMANDS.getValue()], Protocol.commands.RIGHT_SERVO.getValue());
     }
-    
+
     /**
      * Sets right servo bit to high
      */
@@ -520,12 +591,11 @@ public class DataHandler {
         dataToArduino[Protocol.REQUEST_FEEDBACK.getValue()]++;
         this.fireStateChanged();
     }
-    
-    public void setRequestCodeToArduino(byte code){
+
+    public void setRequestCodeToArduino(byte code) {
         dataToArduino[Protocol.REQUEST_FEEDBACK.getValue()] = code;
         this.fireStateChanged();
     }
-    
 
     public void fireStateChanged() {
         Main.enumStateEvent = SendEventState.TRUE;
