@@ -11,13 +11,13 @@ import java.util.concurrent.Semaphore;
 import org.opencv.core.Core;
 
 /**
- *
+ * Main class of the application
+ * 
  * @author Eivind Fugledal
  */
 public class Main {
     
     protected static DataHandler dh;
-    private static GUIData gd;
     private static Thread controller;
     private static Thread server;
     private static Semaphore semaphore;
@@ -27,8 +27,10 @@ public class Main {
     private static CameraCapture camera;
     private static String[] comport = {"/dev/ttyUSB0", "COM3","/dev/ttyACM0","/dev/ttyACM1","/dev/ttyACM2","/dev/ttyACM99"};
     
+
     /**
-     * @param args the command line arguments
+     * start the application
+     * @param args 
      */
     public static void main(String[] args){
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -37,7 +39,6 @@ public class Main {
         dh = new DataHandler();
         dh.setThreadStatus(true);
         
-        gd = new GUIData(dh, semaphore);
         controller = new Thread(new Controller(dh, semaphore));
 
         camera = new CameraCapture();
@@ -46,7 +47,6 @@ public class Main {
         server = new Thread(new UDPServer(semaphore,dh));
 
         
-        gd.start();
         controller.start();
         server.start();
         camera.start();

@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * UDPServer class. handles sending data to and from a client GUI
  * @author Eivind Fugledal
  */
 public class UDPServer implements Runnable {
@@ -67,6 +67,12 @@ public class UDPServer implements Runnable {
         }
     }
 
+    /**
+     * starts a new thread and sends data to GUI controller will not block
+     * receiving thread in this way
+     *
+     * @param data the data to send to GUI
+     */
     public void udpSend(byte[] data) {
         if (hasReceivedSomething) {
             Runnable send;
@@ -91,11 +97,7 @@ public class UDPServer implements Runnable {
         }
 
     }
-    
-    
-    
-    
-    
+
     /**
      * Checks if data received from UDP have changed compared to the one stored
      * in DataHandler.
@@ -110,6 +112,9 @@ public class UDPServer implements Runnable {
         this.release();
     }
 
+    /**
+     * check if new values is ready for sending to GUI controller
+     */
     private void checkForSendingToGUI() {
         byte requestCode;
 
@@ -130,7 +135,7 @@ public class UDPServer implements Runnable {
             this.release();
 
             byte[] x = new byte[2];
-             x = intToByteArray(xAngle);
+            x = intToByteArray(xAngle);
             byte[] y = new byte[2];
             y = intToByteArray(yAngle);
             System.out.println("x: " + Arrays.toString(x));
@@ -147,26 +152,36 @@ public class UDPServer implements Runnable {
         }
 
     }
-    
-    public static final byte[] intToByteArray(int value){
-        return new byte[] {
-            (byte)(value >>> 8),
-            (byte)(value)};
-        
+
+    /**
+     * convert a int value to byte array length 2
+     *
+     * @param value
+     * @return
+     */
+    public static final byte[] intToByteArray(int value) {
+        return new byte[]{
+            (byte) (value >>> 8),
+            (byte) (value)};
+
     }
 
+    /**
+     * acqure the semaphore
+     */
     private void acquire() {
         try {
             semaphore.acquire();
 
-        
-
-} catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {
             Logger.getLogger(Controller.class
-.getName()).log(Level.SEVERE, null, ex);
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * release the semaphore
+     */
     private void release() {
         semaphore.release();
     }

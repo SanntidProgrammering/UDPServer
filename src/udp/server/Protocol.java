@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package udp.server;
 
 /**
- *
+ * Protocol class. values of the protocol used for communication
  * @author Eivind Fugledal
  */
 public enum Protocol {
