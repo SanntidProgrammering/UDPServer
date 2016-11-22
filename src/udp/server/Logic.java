@@ -243,12 +243,12 @@ public class Logic {
                 dh.setRightMotorSpeed(maxSpeed);
                 break;
             case GOREVANDRIGHT:
-                dh.setLeftMotorSpeed(maxSpeed);
-                dh.setRightMotorSpeed(maxSpeed / 4);
+                dh.setLeftMotorSpeed(maxSpeed/4);
+                dh.setRightMotorSpeed(maxSpeed);
                 break;
             case GOREVANDLEFT:
-                dh.setLeftMotorSpeed(maxSpeed / 4);
-                dh.setRightMotorSpeed(maxSpeed);
+                dh.setLeftMotorSpeed(maxSpeed);
+                dh.setRightMotorSpeed(maxSpeed/4);
                 break;
             // unknown command
             case DEFAULT:

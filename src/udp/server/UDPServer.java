@@ -20,7 +20,6 @@ public class UDPServer implements Runnable {
 
     private DatagramSocket serverSocket;
 
-
     private final int serverPort = 9876;
 
     private boolean hasReceivedSomething = false;
@@ -51,7 +50,7 @@ public class UDPServer implements Runnable {
                 //guiIp = receivePacket.getAddress();
                 Main.ipAdress = receivePacket.getAddress().getHostAddress();
 
-                System.out.println(Arrays.toString(receiveData) + " FROM GUI, with ip: " + Main.ipAdress );
+                System.out.println(Arrays.toString(receiveData) + " FROM GUI, with ip: " + Main.ipAdress);
 
                 this.setDataToDatahandler(receiveData);
                 hasReceivedSomething = true;
@@ -70,23 +69,33 @@ public class UDPServer implements Runnable {
 
     public void udpSend(byte[] data) {
         if (hasReceivedSomething) {
-            try {
-                DatagramPacket sendpacket
-                        = new DatagramPacket(data, data.length, InetAddress.getByName(Main.ipAdress), 9877);
+            Runnable send;
+            send = () -> {
                 try {
-                    serverSocket.send(sendpacket);
-                    System.out.println(Arrays.toString(data) + " TO GUI, with ip: " + Main.ipAdress);
-                } catch (IOException ex) {
+
+                    DatagramPacket sendpacket
+                            = new DatagramPacket(data, data.length, InetAddress.getByName(Main.ipAdress), 9877);
+                    try {
+                        serverSocket.send(sendpacket);
+                        System.out.println(Arrays.toString(data) + " TO GUI, with ip: " + Main.ipAdress);
+                    } catch (IOException ex) {
+                        Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (UnknownHostException ex) {
                     Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            };
+            new Thread(send).start();
         } else {
             System.out.println("UDP is not ready. missing IP address for GUI");
         }
-    }
 
+    }
+    
+    
+    
+    
+    
     /**
      * Checks if data received from UDP have changed compared to the one stored
      * in DataHandler.
@@ -150,8 +159,11 @@ public class UDPServer implements Runnable {
         try {
             semaphore.acquire();
 
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        
+
+} catch (InterruptedException ex) {
+            Logger.getLogger(Controller.class
+.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
