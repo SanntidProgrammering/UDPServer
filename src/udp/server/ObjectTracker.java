@@ -55,12 +55,12 @@ public class ObjectTracker implements Runnable {
     private Mat array255;
     private Mat distance;
     
-    private int hueMin = 23;//35;
-    private int hueMax = 35;//74;
-    private int satMin = 70;//93;
-    private int satMax = 170;//223;
-    private int valMin = 78;//74;
-    private int valMax = 200;//14335;
+    private int hueMin = 40;//35;
+    private int hueMax = 68;//74;
+    private int satMin = 51;//93;
+    private int satMax = 255;//223;
+    private int valMin = 38;//74;
+    private int valMax = 167;//14335;
     
     private double brightness;
     private double contrast;
@@ -130,7 +130,7 @@ public class ObjectTracker implements Runnable {
                         webcam_image.convertTo(webcam_image,-1, brightness, contrast);
                                      
                         //Adding blur to remove noise
-                        //Imgproc.blur(webcam_image, webcam_image, new Size(7, 7));
+                        Imgproc.blur(webcam_image, webcam_image, new Size(7, 7));
                                     
                         // converting to HSV image
                         Imgproc.cvtColor(webcam_image, hsv_image, Imgproc.COLOR_BGR2HSV);  

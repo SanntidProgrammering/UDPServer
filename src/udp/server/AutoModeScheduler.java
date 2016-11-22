@@ -49,11 +49,15 @@ public class AutoModeScheduler extends TimerTask {
     private double F;
     private double RR;
 
-    private final double pidOutputLimit = 100.0; // feks
+    private final double pidOutputLimit = 255f/2f; // feks
     private final double speedFactor = 60.0; // % fart av maksimal hastighet
 
     public AutoModeScheduler(DataHandler dh, Semaphore semaphore, Logic logic) {
-        this.pid = new MiniPID();
+        
+
+        
+        this.pid = new MiniPID(P,I,D,F);
+        this.pid.setOutputRampRate(RR);
         this.semaphore = semaphore;
         this.dh = dh;
         this.logic = logic;
@@ -63,6 +67,13 @@ public class AutoModeScheduler extends TimerTask {
         pid.setOutputRampRate(5.0);
         this.pid.setOutputFilter(.01);
         //miniPID.setSetpointRange(40);
+        acquire();
+        P = dh.getP();
+        I = dh.getI();
+        D = dh.getD();
+        F = dh.getF();
+        RR = dh.getRR();
+        release();
     }
 
     @Override
@@ -125,20 +136,28 @@ public class AutoModeScheduler extends TimerTask {
         output = pid.getOutput(xAngle, setpoint); // pid regulator
         output = limit(output, -pidOutputLimit, pidOutputLimit); // begrens output
 
-        if (output != lastOutput) {
-            double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
-            double outputPidPercent = output / pidOutputLimit; // utgang fra pid i prosent av maks pådrag 
+        //if (output != lastOutput) {
+            //double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
+            //double outputPidPercent = output / pidOutputLimit; // utgang fra pid i prosent av maks pådrag 
 
-            float leftSpeed  = (float) min((speed * Math.abs(1 + outputPidPercent)), 255f);
-            float rightSpeed = (float) min((speed * Math.abs(1 - outputPidPercent)), 255f);
-            System.out.println("*************************************" + "PID OUTPUT: " + outputPidPercent + " SPEEDS, LEFT: " + leftSpeed + " RIGHT: " + rightSpeed);
+            
+            
+             float leftSpeed  = (255f/2f) + (float) output;       
+             float rightSpeed = (255f/2f) - (float) output;
+            
+            
+            
+            
+            //float leftSpeed  = (float) min((speed * Math.abs(1 + outputPidPercent)), 255f);
+            //float rightSpeed = (float) min((speed * Math.abs(1 - outputPidPercent)), 255f);
+            System.out.println("*************************************" + "PID OUTPUT: " + output + " SPEEDS, LEFT: " + leftSpeed + " RIGHT: " + rightSpeed);
 
             acquire();
             logic.runFWD(leftSpeed, rightSpeed);
             logic.decideToHitBallOrNot(dh.getDistanceSensor());
             dh.incrementRequestCode();
             release();
-        }
+       // }
         lastOutput = output;
     }
 
@@ -185,7 +204,7 @@ public class AutoModeScheduler extends TimerTask {
         } else if (intValue == AUTOMODES.SEARCH_RIGHT.value) {
             result = AUTOMODES.SEARCH_RIGHT;
         }
-
+        System.out.println("STATE CHANGED " +result);
         return result;
     }
 }
