@@ -13,19 +13,33 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * serialReader class
+ * reads values from a serial port
+ * @author lars-harald
+ */
 public class SerialReader implements Runnable {
-    // data from arduino
 
     private final InputStream in;
     private final DataHandler dh;
     private final Semaphore semaphore;
 
+
+    /**
+     * create a new SerialReader
+     * @param in the inputstream to read from
+     * @param datahandler the shared resource
+     * @param semaphore semaphore object
+     */
     public SerialReader(InputStream in, DataHandler datahandler, Semaphore semaphore) {
         this.in = in;
         this.dh = datahandler;
         this.semaphore = semaphore;
     }
 
+    /**
+     * start the SerialReader
+     */
     @Override
     public void run() {
         while (dh.shouldThreadRun()) {
@@ -34,6 +48,7 @@ public class SerialReader implements Runnable {
                 in.read(data,0,data.length);
                 System.out.println(Arrays.toString(data)+ "FROM SERIAL");
                 
+                // acuire the semaphore and write new values to the datahandler object
                 semaphore.acquire();   
                 dh.handleDataFromArduino(data);
                 

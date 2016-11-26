@@ -11,11 +11,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * AutoModeScheduler class, extends TimerTask
+ * starts a new PID regulator that controls the movement of the vehicle from a given setpoint and feedback value
  * @author lars-harald
  */
 public class AutoModeScheduler extends TimerTask {
 
+    /**
+     * the states of autonomus mode
+     */
     private static enum AUTOMODES {
         FWD(1),
         SEARCH_LEFT(-255),
@@ -52,6 +56,12 @@ public class AutoModeScheduler extends TimerTask {
     private final double pidOutputLimit = 255f / 2f; // feks
     private final double speedFactor = 60.0; // % fart av maksimal hastighet
 
+    /**
+     * create a new AutoModeScheduler
+     * @param dh the shared resource
+     * @param semaphore semaphore object
+     * @param logic logic class 
+     */
     public AutoModeScheduler(DataHandler dh, Semaphore semaphore, Logic logic) {
         this.semaphore = semaphore;
         acquire();
@@ -76,6 +86,9 @@ public class AutoModeScheduler extends TimerTask {
 
     }
 
+    /**
+     * run the AutoModeScheduler. starts the PID regulator 
+     */
     @Override
     public void run() {
 
@@ -119,6 +132,9 @@ public class AutoModeScheduler extends TimerTask {
 
     }
 
+    /**
+     * acquire the semaphore
+     */
     private void acquire() {
         try {
             semaphore.acquire();
@@ -128,10 +144,16 @@ public class AutoModeScheduler extends TimerTask {
         }
     }
 
+    /**
+     * release the semaphore
+     */
     private void release() {
         semaphore.release();
     }
 
+    /**
+     * PID tracking object, object in sight of  the camera
+     */
     private void advance() {
 
         output = pid.getOutput(xAngle, setpoint); // pid regulator
@@ -156,6 +178,9 @@ public class AutoModeScheduler extends TimerTask {
         lastOutput = output;
     }
 
+    /**
+     * searching for the object, object in left hand of the camera
+     */
     private void searchLeft() {
         double percentTurnSpeed = 0.80d;
         double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
@@ -169,6 +194,9 @@ public class AutoModeScheduler extends TimerTask {
         release();
     }
 
+    /**
+     * searching for the object, object in right hand of the camera
+     */
     private void searchRight() {
         double percentTurnSpeed = -0.80d;
         double speed = 255.0 * (speedFactor / 100.0);  // maks hastighet rett frem
@@ -182,14 +210,32 @@ public class AutoModeScheduler extends TimerTask {
         release();
     }
 
+    /**
+     * limit a double value
+     * @param a
+     * @param MIN
+     * @param MAX
+     * @return 
+     */
     private double limit(double a, double MIN, double MAX) {
         return (a > MAX) ? MAX : (a < MIN ? MIN : a);
     }
 
+    /**
+     * get the minimum value of two double's
+     * @param a
+     * @param MIN
+     * @return 
+     */
     private double min(double a, double MIN) {
         return MIN < a ? MIN : a;
     }
 
+    /**
+     * set the state of autonomus mode
+     * @param value
+     * @return 
+     */
     private AUTOMODES setState(double value) {
         AUTOMODES result = AUTOMODES.FWD;
         long intValue = Math.round(value);

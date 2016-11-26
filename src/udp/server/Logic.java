@@ -9,7 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Logic class
+ * handles the logic that controls the vehicle and commands
  * @author lars-harald
  */
 public class Logic {

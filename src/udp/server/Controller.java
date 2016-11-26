@@ -11,8 +11,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author Eivind Fugledal
+ * Controller class
+ * controls the vehicle and the states of it
+ * @author lars-harald
  */
 public class Controller implements Runnable {
 
@@ -28,6 +29,11 @@ public class Controller implements Runnable {
 
     private Thread t;
 
+    /**
+     * create a new Controller
+     * @param dh the shared resource
+     * @param semaphore semaphore object
+     */
     public Controller(DataHandler dh, Semaphore semaphore) {
         this.dh = dh;
         this.semaphore = semaphore;
@@ -35,11 +41,17 @@ public class Controller implements Runnable {
         this.timer = new Timer();
     }
 
+    /**
+     * start a new thread containing the controller
+     */
     public void start() {
         t = new Thread(this, "controller thread");
         t.start();
     }
 
+    /**
+     * run the controller
+     */
     @Override
     public void run() {
 
@@ -132,6 +144,9 @@ public class Controller implements Runnable {
         release();
     }
 
+    /**
+     * dummy method to aquire feedback from arduino controller
+     */
     private void startRequestFeedbacks() {
         Runnable run;
         run = () -> {
@@ -149,6 +164,9 @@ public class Controller implements Runnable {
         new Thread(run).start();
     }
 
+    /**
+     * acquire the semaphore object
+     */
     private void acquire() {
         try {
             semaphore.acquire();
@@ -158,6 +176,9 @@ public class Controller implements Runnable {
         }
     }
 
+    /**
+     * release the semaphore object
+     */
     private void release() {
         semaphore.release();
     }

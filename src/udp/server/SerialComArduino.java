@@ -11,19 +11,33 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.Semaphore;
 
+/**
+ * serialComArduino class
+ * enables two-way communication between the application and a serialport
+ * @author lars-harald
+ */
 public class SerialComArduino
 {
     private Thread reader; // reads from arduino
     private Thread writer;  // writes to arduino
     private final DataHandler datahandler;
     
+    /**
+     * create a new SerialComArduino object
+     * @param datahandler the shared resource
+     */
     public SerialComArduino(DataHandler datahandler)
     {
-        super();
         this.datahandler = datahandler;
     }
 
-    void connect (String portName, Semaphore semaphore) throws Exception
+    /**
+     * connect streams to a serialport and start the reader and writer
+     * @param portName the name of the usb port
+     * @param semaphore semaphore object 
+     * @throws Exception 
+     */
+    public void connect (String portName, Semaphore semaphore) throws Exception
     {
         System.out.println("Connect");
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);

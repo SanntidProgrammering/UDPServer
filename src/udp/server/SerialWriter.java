@@ -12,6 +12,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.Semaphore;
 
+/**
+ * SerialWriter class.
+ * writes data to serialport (arduino)
+ * @author lars-harald
+ */
 public class SerialWriter implements Runnable {
     // stream to arduino
 
@@ -19,14 +24,24 @@ public class SerialWriter implements Runnable {
     private DataHandler datahandler;
     private Semaphore semaphore;
 
+    /**
+     * create a new SerialWriter
+     * @param out the outputstream to write to
+     * @param datahandler the shared resource
+     * @param semaphore semaphore object
+     */
     public SerialWriter(OutputStream out, DataHandler datahandler, Semaphore semaphore) {
         this.out = out;
         this.datahandler = datahandler;
         this.semaphore = semaphore;
     }
 
+    /**
+     * start the SerialWriter
+     */
     public void run() {
         try {
+            // checking a boolean is considerd safa outside sync methods
             while (datahandler.shouldThreadRun()) {
 
                 if (datahandler.checkSendDataAvailable()) {
@@ -43,6 +58,10 @@ public class SerialWriter implements Runnable {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * acquire the semaphore
+     */
     private void acquire() {
         try {
             semaphore.acquire();
@@ -52,6 +71,9 @@ public class SerialWriter implements Runnable {
         }
     }
 
+    /**
+     * release the semaphore
+     */
     private void release() {
         semaphore.release();
     }
